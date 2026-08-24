@@ -70,7 +70,7 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
   }
   @media (max-width: 48rem) {
     .app { display: block; }
-    .sidebar { display: none; }
+    :global(.sidebar) { display: none; }
     .main-area { padding-top: 1.5rem; }
   }
 </style>
