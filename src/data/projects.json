@@ -1,0 +1,14 @@
+[
+  {
+    "name": "personal-website",
+    "description": "本站源码：Astro 静态博客，trauma 版式风格。",
+    "tech": ["Astro", "CSS", "TypeScript"],
+    "url": "https://github.com/R03montia/personal-website"
+  },
+  {
+    "name": "示例项目占位",
+    "description": "第二个项目的占位描述，替换成真实项目即可。",
+    "tech": ["Python"],
+    "url": "https://github.com/R03montia"
+  }
+]
