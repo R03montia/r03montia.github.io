@@ -1,0 +1,76 @@
+---
+import '@fontsource/nixie-one';
+import '@fontsource/outfit';
+import '@fontsource/atkinson-hyperlegible';
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+import MobileNav from '../components/MobileNav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = 'R03montia 的个人站点。' } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.toggleAttribute('data-theme', dark);
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      })();
+    </script>
+  </head>
+  <body data-rainy>
+    <a class="skip-link" href="#main-content">跳到主内容</a>
+    <div class="app">
+      <Sidebar />
+      <main id="main-content" class="main-area">
+        <slot />
+      </main>
+    </div>
+    <div class="silhouettes" aria-hidden="true">
+      <svg class="sky-l1" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V60h30V40h20v20h40V30h25v30h35V50h30v70zM260 120V45h28V25h18v20h30v25h40V35h26v85zM520 120V55h35V35h22v20h33V15h20v105zM740 120V50h30V30h20v20h35v50zM900 120V40h26V20h20v20h32v80zM1040 120V55h30V35h22v85z"/></svg>
+      <svg class="sky-l2" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V70h50V50h30v20h45V35h28v85zM180 120V60h35V40h22v80zM300 120V45h40V25h20v95zM420 120V65h45V45h25v75zM560 120V50h30V30h24v90zM700 120V70h40V50h26v70zM840 120V40h35V20h22v100zM980 120V60h42V42h26v78zM1110 120V50h34V32h24v88z"/></svg>
+      <svg class="sky-l3" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V85h60V65h35v20h50V55h32v65zM250 120V75h45V58h26v62zM400 120V90h55V68h30v52zM560 120V72h40V56h28v64zM720 120V82h48V64h30v56zM900 120V68h42V52h28v68zM1060 120V78h50V60h30v60z"/></svg>
+    </div>
+    <div class="rain-overlay" aria-hidden="true"></div>
+    <slot name="after-main" />
+    <MobileNav />
+    <script>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const dark = root.getAttribute('data-theme') !== 'dark';
+        if (dark) root.setAttribute('data-theme', 'dark');
+        else root.removeAttribute('data-theme');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .app { display: flex; min-height: 100vh; }
+  .main-area {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem calc(5rem + env(safe-area-inset-bottom));
+  }
+  @media (max-width: 48rem) {
+    .app { display: block; }
+    .sidebar { display: none; }
+    .main-area { padding-top: 1.5rem; }
+  }
+</style>

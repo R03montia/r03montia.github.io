@@ -1,0 +1,39 @@
+---
+const items = [
+  { href: '/', label: '首页' },
+  { href: '/blog/', label: '博客' },
+  { href: '/projects/', label: '项目' },
+  { href: '/about/', label: '关于' },
+];
+const current = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? current === '/' : current.startsWith(href);
+---
+<nav class="mobile-nav" aria-label="移动端导航">
+  {items.map((it) => (
+    <a href={it.href} class:list={[{ active: isActive(it.href) }]} aria-current={isActive(it.href) ? 'page' : undefined}>{it.label}</a>
+  ))}
+</nav>
+
+<style>
+  .mobile-nav { display: none; }
+  @media (max-width: 48rem) {
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.4rem 0 max(0.4rem, env(safe-area-inset-bottom));
+      background: rgb(var(--content-bg) / 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgb(var(--line) / 0.4);
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+    }
+    .mobile-nav a { color: rgb(var(--text-secondary)); padding: 0.25rem 0.75rem; }
+    .mobile-nav a.active { color: rgb(var(--text)); }
+  }
+</style>
