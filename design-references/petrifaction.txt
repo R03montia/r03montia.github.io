@@ -1,0 +1,738 @@
+===== petrifaction =====
+
+--- CSS block 1 (16678 chars) ---
+@import url('https://chinese-fonts-cdn.deno.dev/packages/syst/dist/SourceHanSerifCN/result.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@300;400;500;700&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Oswald:200,300,400,500,600,700&subset=cyrillic,latin-ext,vietnamese');
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+@import url("https://evernight-aquarium.wikidot.com/component:non-savingpage/code/1");
+ 
+/* 全局 */
+:root {
+  --title-font: 'Source Han Serif CN VF', serif;
+  --body-font: "Noto Sans SC", sans-serif;
+  --greyColor: #707070;
+  --lightColor: #FFF;
+  --darkColor: #000;
+}
+ 
+body {
+    background-color: var(--lightColor);
+    color: var(--darkColor);
+    font-family: "Noto Serif SC", "Noto Serif", serif !important;
+    font-family: var(--body-font);
+    font-weight: 200;
+    font-size: 0.85rem;
+    font-style: normal;
+}
+ 
+/* 滤镜 */
+html {
+    filter: grayscale(0.85);
+}
+ 
+/* 链接 */
+a {
+    color: #707070;
+}
+ 
+/*访问过的链接颜色*/
+a:visited {
+    color: #ababab; 
+}
+ 
+/* 悬停 */
+a:hover {
+    color: #ababab;
+}
+ 
+.hovertip {
+    background-color: #FFFFFF !important;
+    border: solid 1px #000000 !important;
+}
+ 
+.footnotes-footer {
+    display: none;
+    background-color: #FFFFFF;
+}
+ 
+textarea {
+    color: var(--darkColor);
+    background-color: var(--lightColor) !important;
+}
+ 
+/* 标题 */
+div#container-wrap {
+    background: url(https://scpsandboxcn.wikidot.com/local--files/semimonth/23925.png) top center no-repeat;
+    background-size: 120rem 55rem;
+    background-position: center -30rem;
+    flex: auto;
+}
+ 
+/* 标题 适配移动端 */
+@media (max-width: 479px) {
+  #header{
+    background-position: 0 5.5em;
+    background-size: 55px 55px;
+  }
+  div#container-wrap {
+    background-size: 100rem 50rem;
+    background-position: center -30rem;
+  }
+  #content-wrap {
+    margin-top: -2.75rem;
+  }
+}
+ 
+@media (min-width: 480px) and (max-width: 580px) {
+  #header{
+    background-position: 0.5em 4.5em;
+    background-size: 66px 66px;
+  }
+}
+@media (min-width: 581px) and (max-width: 767px) {
+  #header{
+    background-size: 77px 77px;
+  }
+}
+ 
+h1, h2, h3, h4, h5, h6, #page-title {
+    font-family: var(--title-font);
+    color: var(--darkColor);
+    font-family: "Oswald", "Zhi Mang Xing", sans-serif;
+}
+ 
+#header {
+    background-image: none;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 10rem;
+    padding-bottom: 10rem;
+}
+ 
+#header h1 span, #header h2 span {
+    visibility: hidden;
+}
+ 
+#header h1 span::before {
+    display: flex;
+    justify-content: center;
+    line-height: 1em;
+    content: "石化";
+    color: var(--lightColor);
+    visibility: visible;
+    text-align: center;
+    font-size: 6.25rem;
+    font-family: "Oswald", "Ma Shan Zheng", sans-serif;
+}
+ 
+#header h1 a::before {
+    content: none;
+}
+ 
+@media (min-width: 767px) {
+  #header h1 span::before {
+    font-size: 8.75rem;
+  }
+}
+ 
+/* 底部图片 */
+#content-wrap {
+    background: url(https://scpsandboxcn.wikidot.com/local--files/semimonth/23926.png) no-repeat;
+    background-size: 150rem;
+    max-width: 100%;
+    background-position: center bottom -1rem;
+    padding-bottom: 0;
+}
+ 
+#main-content {
+    padding-bottom: 20rem !important;
+}
+ 
+/* 底部图片 适配移动端 */
+@media (max-width: 767px) {
+  #content-wrap {
+    background-size: 60rem;
+    background-position: center bottom 0;
+  }
+  #main-content {
+    padding-bottom: 10em;
+  }
+}
+ 
+#header h1, #header h2 {
+    font-size: 100%;
+    margin: 0;
+}
+ 
+#header h1 a {
+    font-family: "Oswald", "Zhi Mang Xing", sans-serif;
+}
+ 
+#page-title,
+#action-area h1 {
+    margin: auto;
+    text-align: center;
+}
+ 
+#page-title {
+    font-weight: bold;
+    font-size: 3em;
+    border-color: transparent;
+    background-image: linear-gradient(to top, var(--darkColor), var(--lightColor));
+    -webkit-background-clip: text;
+    color: transparent;
+    border-bottom: solid var(--darkColor) 0.02rem;
+    margin-bottom: 0.5rem;
+}
+ 
+/* 顶栏菜单 */
+#top-bar ul li {
+    display: none;
+}
+ 
+/* Footer更改 */
+ 
+#footer {
+    margin-top: -0.5em;
+    background: var(--greyColor) !important;
+}
+ 
+/* 侧边栏 */
+#side-bar .side-block, #side-bar .side-block.media, #side-bar .side-block.resources, #interwiki .side-block {
+    background: transparent !important;
+    box-shadow: var(--greyColor);
+    border: solid 0.15em;
+    border-color: var(--greyColor);
+}
+#side-bar .heading {
+    color: var(--greyColor);
+    border-color: var(--greyColor);
+}
+#side-bar div.menu-item .sub-text {
+    color: var(--greyColor);
+}
+ 
+#side-bar {
+    filter: grayscale(1);
+    background: url(http://scp-wiki.wdfiles.com/local--files/about-the-scp-foundation/bg-marble.png);
+}
+ 
+/* 图像样式 */
+.image-block-base {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+ 
+.image-block-base img {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+ 
+/* blockquote */
+ 
+blockquote, div.blockquote {
+    border: solid 0.15em var(--greyColor);
+    background-position: center;
+    background: url(http://scp-wiki.wdfiles.com/local--files/about-the-scp-foundation/bg-marble.png);
+    border-radius: 0.5em;
+    box-shadow: 0 0.2em 0.2em rgba(171, 171, 171, 0.8);
+}
+ 
+.scp-image-block .scp-image-caption {
+    background-position: center;
+    background-size: 100% cover;
+    background: var(--greyColor);
+    color: #ffffff;
+    font-family: var(--title-font);
+}
+ 
+/* Music div */
+.music {
+    text-align: center;
+    margin:2rem 0;
+}
+ 
+.music::before {
+    color: var(--greyColor);
+    display: block;
+    content: "♫";
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    margin: -1.5em 0;
+}
+ 
+/* 表格 */
+#page-content .wiki-content-table tr th,
+#page-content .wiki-content-table tr td {
+    border: solid 1px var(--lightColor);
+    background-color:  transparent;
+}
+ 
+#page-content .wiki-content-table tr th {
+    font-family: var(--title-font);
+ 
+    color: var(--lightColor);
+ 
+    background-position: center;
+    background-size: 100% cover;
+    background: var(--greyColor);
+}
+ 
+/* 编辑锁定 */
+#lock-info {
+    background-color: var(--lightColor);
+    border-color: var(--greyColor);
+    opacity: 0.9;
+}
+ 
+/* 窗口 */
+.owindow {
+    background-position: center;
+    background-size: 100% cover;
+    background-image: url("http://scp-wiki.wdfiles.com/local--files/about-the-scp-foundation/bg-marble.png");
+    border-radius: 0.5rem;
+    border-color: var(--greyColor);
+    opacity: 0.9;
+}
+ 
+.owindow .content img {
+    background: transparent !important;
+}
+ 
+.owindow .title {
+    background: var(--darkerColor);
+}
+ 
+/* 搜索栏/用户信息 */
+/* source: http://1nu.wikidot.com/iikanji */
+ 
+div#search-top-box {
+    top: 18.5px;
+    width: 100%;
+    right: 70px
+}
+ 
+div#search-top-box form {
+    display: flex;
+    justify-content: flex-end
+}
+ 
+div#search-top-box form input[type="text"],
+div#search-top-box form input[type="text"]:hover {
+    background-color: #5B5B5B !IMPORTANT;
+    display: inline-block;
+    height: 1.1rem;
+    width: 8rem;
+    transition: width .25s;
+    outline: none;
+    filter: brightness(120%);
+}
+ 
+_::-webkit-full-page-media,
+_:future,
+:root div#search-top-box form input[type="text"] {
+    font-size: 16px
+}
+ 
+div#search-top-box form input[type="text"]:not(:focus),
+div#search-top-box form input[type="text"]:not(:focus):not(:hover) {
+    background-color: var(--base-color);
+    color: transparent;
+    cursor: pointer;
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    border-radius: 50px;
+    box-shadow: none;
+    background-position: center;
+    background-size: 55%;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22%23ddd%22%20d%3D%22M505%20442.7L405.3%20343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3%2044-79.7%2044-128C416%2093.1%20322.9%200%20208%200S0%2093.1%200%20208s93.1%20208%20208%20208c48.3%200%2092.7-16.4%20128-44v16.3c0%206.4%202.5%2012.5%207%2017l99.7%2099.7c9.4%209.4%2024.6%209.4%2033.9%200l28.3-28.3c9.4-9.4%209.4-24.6.1-34zM208%20336c-70.7%200-128-57.2-128-128%200-70.7%2057.2-128%20128-128%2070.7%200%20128%2057.2%20128%20128%200%2070.7-57.2%20128-128%20128z%22%2F%3E%3C%2Fsvg%3E");
+}
+ 
+div#search-top-box form input[type="submit"] {
+    display: none
+}
+ 
+#search-top-box-input {
+    border: solid 1px var(--background);
+    border-radius: 5px
+}
+ 
+#login-status {
+    top: 2px
+}
+ 
+#login-status {
+    display: flex;
+    flex-direction: column;
+    align-content: space-around;
+    font-size: 0
+}
+ 
+#login-status .printuser {
+    margin: 0;
+    background-color: none;
+    position: absolute;
+    top: 13px;
+    right: 0px;
+    width: 28px;
+    padding: 0;
+}
+ 
+#login-status .printuser img.small {
+    background: none !important;
+    margin: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 100px;
+    box-shadow: 0 0 3px #3f3f3f;
+}
+ 
+#login-status [id] {
+    font-size: .72rem
+}
+ 
+#login-status>a[href="javascript:;"] {
+    font-size: 0;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    text-decoration: none;
+    background: none;
+    width: 21.8px;
+    position: absolute;
+    top: 13px;
+    height: 21px;
+    right: 30px;
+    border: none;
+}
+ 
+#login-status>a[href="javascript:;"]:before {
+    display: inline-block;
+    font-family: FontAwesome;
+    font-size: 1.3rem;
+    margin: 4px 3px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    transform: translate(0, 0);
+}
+ 
+#login-status #account-topbutton:before {
+    content: "\f013";
+    color: var(--base-color)
+}
+ 
+#login-status .login-status-sign-in {
+    right: 35px !important;
+}
+ 
+#login-status .login-status-sign-in:before {
+    content: "\f13e";
+    color: var(--base-color)
+}
+ 
+#login-status .login-status-create-account {
+    right: 11px !important;
+    margin: 0 0 .25rem;
+}
+ 
+div#login-status a.login-status-create-account {
+    right: 11px;
+}
+ 
+#login-status .login-status-create-account:before {
+    content: "\f067";
+    color: var(--base-color)
+}
+ 
+#login-status #my-account {
+    display: none
+}
+ 
+#login-status a strong {
+    position: absolute;
+    top: 0;
+    right: 2.25rem;
+    font-family: var(--bauhaus);
+    font-size: 1rem;
+    var(--lightColor)-space: nowrap
+}
+ 
+#login-status #account-topbutton:not(:focus):not(:focus-within):not(:hover):not(:active)+#account-options {
+    display: none !important
+}
+ 
+#header #login-status #account-topbutton+#account-options:focus,
+#header #login-status #account-topbutton+#account-options:focus-within,
+#header #login-status #account-topbutton+#account-options:hover,
+#header #login-status #account-topbutton+#account-options:active {
+    display: block !important
+}
+ 
+#account-options ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around
+}
+ 
+#account-options ul>li {
+    flex-grow: 1;
+    text-align: center;
+    width: 40%
+}
+ 
+#account-options ul>li a {
+    transition: all .25s ease-in-out
+}
+ 
+#account-options ul>li a:hover {
+    background-color: var(--base-color);
+    color: var(--background);
+    text-decoration: none
+}
+ 
+#login-status ul a {
+    color: #000
+}
+ 
+/* Sidebar组件 */
+/* 源代码链接: http://ah-sandbox.wikidot.com/component:collapsible-sidebar-x1 */
+ 
+#top-bar .open-menu a {
+        position: fixed;
+        top: 0.5em;
+        left: 0.5em;
+        z-index: 5;
+        font-family: 'Nanum Gothic', san-serif;
+        font-size: 30px;
+        font-weight: 700;
+        width: 30px;
+        height: 30px;
+        line-height: 0.9em;
+        text-align: center;
+        border: 0.08em solid var(--greyColor);
+        background: url(http://scp-wiki.wdfiles.com/local--files/about-the-scp-foundation/bg-marble.png);
+        border-radius: 0.2em;
+        color: var(--greyColor);
+        pointer-events: auto;
+        opacity: 0.8;
+}
+ 
+@media not all and (max-width: 767px) {
+ 
+    #top-bar .mobile-top-bar {
+        display: block;
+        pointer-events: none;
+    }
+ 
+    #top-bar .mobile-top-bar li {
+        display: none;
+    }
+ 
+    #main-content {
+        max-width: 44.5rem;
+        margin: 0 auto;
+        padding: 0;
+        transition: max-width 0.2s ease-in-out;
+    }
+ 
+    #side-bar {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: -18rem;
+        width: 15.25rem;
+        height: 100%;
+        margin: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        z-index: 10;
+        padding: 1em 1em 0 1em;
+        transition: left 0.4s ease-in-out;
+        border-right: 0.2em solid;
+        border-color: var(--greyColor);
+        scrollbar-width: thin;
+    }
+ 
+    #side-bar:target {
+        left: 0;
+    }
+    #side-bar:focus-within {
+        left: 0;
+    }
+ 
+    #side-bar:target .close-menu {
+        display: block;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        margin-left: 17rem;
+        opacity: 0;
+        z-index: -1;
+        visibility: visible;
+    }
+ 
+    #side-bar:not(:target) .close-menu { display: none; }
+ 
+    #top-bar .open-menu a:hover {
+        text-decoration: none;
+    }
+}
+ 
+@media (max-width: 767px) {
+    #side-bar:target .close-menu {
+        background: transparent;
+    }
+}
+ 
+#side-bar a:visited, a {
+    color: var(--greyColor);
+}
+ 
+a.newpage {
+    color: var(--greyColor);
+}
+ 
+#side-bar .collapsible-block-unfolded-link .collapsible-block-link {
+    color: var(--greyColor);
+}
+ 
+/* 评分模块 来自废年版式 */
+#page-content {
+    font-size: 0.925rem;
+}
+ 
+.page-rate-widget-box, #page-content .creditRate .rate-box-with-credit-button .page-rate-widget-box {
+    background-color: transparent;
+    border: solid 1px #000;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    margin-left: 0;
+    margin-right: 0;
+}
+ 
+.page-rate-widget-box .rate-points {
+    color: #000 !important;
+    background-color: transparent !important;
+    border-radius: 0;
+    border: none;
+}
+ 
+.page-rate-widget-box .rateup.btn,
+.page-rate-widget-box .ratedown.btn,
+.page-rate-widget-box .cancel {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+}
+ 
+.page-rate-widget-box .rateup.btn a,
+.page-rate-widget-box .ratedown.btn a,
+.page-rate-widget-box .cancel a {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+    color: #666;
+}
+ 
+.page-rate-widget-box .rateup.btn a:hover,
+.page-rate-widget-box .ratedown.btn a:hover,
+.page-rate-widget-box .cancel a:hover {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+    color: #000;
+}
+ 
+#page-content .rate-box-with-credit-button {
+    border-radius: 0;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+ 
+#page-content .creditRate {
+    margin-left: 0;
+    margin-right: 0;
+}
+ 
+#page-content .rate-box-with-credit-button .creditButton p a {
+    display: inline-block;
+    margin: 0;
+    margin-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 2px;
+    width: 20px;
+    height: 100%;
+    font-size: 12px;
+    text-align: center;
+    color: #666;
+    background-color: transparent;
+    border: solid 1px #000;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    position: static;
+    line-height: normal;
+}
+ 
+#page-content .rate-box-with-credit-button .creditButton p a:hover {
+    color: #000;
+}
+ 
+/* 著作信息 */
+.modalbox {
+    background: url(http://scp-wiki.wdfiles.com/local--files/about-the-scp-foundation/bg-marble.png) !important;
+    box-shadow: 0 0.2rem 0.6rem rgba(171, 171, 171, 0.5) !important;
+    border-color: var(--greyColor);
+}
+ 
+.creditButtonStandalone p a {
+    display: inline-block !important;
+    margin: 0;
+    margin-left: 5px;
+    padding-top: 3px;
+    padding-bottom: 0 !important;
+    width: 20px !important;
+    height: 100% !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    color: #666 !important;
+    background-color: transparent !important;
+    border: solid 1px #000;
+    border-radius: 3px !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25) !important;
+}
+ 
+.creditButtonStandalone p a:hover {
+    color: #000 !important;
+}
+ 
+/* wikiwalk */
+.footer-wikiwalk-nav {
+    text-align: center;
+}
+ 
+/* 面包屑导航 */
+#breadcrumbs {
+    margin: -0.5em 0 1em;
+}
+
+--- PAGE TEXT (455 chars) ---
+基础信息 页面元素 杀了她，顺便杀了我😭。杀了她，顺便杀了我😭。杀了她，顺便杀了我😭。杀了她，顺便杀了我😭。杀了她，顺便杀了我😭。 基础信息 在你的页面开头添加如下代码以应用此版式： Footnotes 1 . 真的有61个，不信你数数看。 2 . <tt>等宽字</tt> 3 . 少打 [[=]] 和♫也算便利，嗯。 window['nitroAds'].createAd('wad-scp-wiki-cn-below-content-anchor', { "refreshTime": 30, "format": "anchor-v2", "anchor": "bottom", "anchorPersistClose": false, "mediaQuery": "(min-width: 0px)", "report": { "enabled": true, "icon": true, "wording": "Report Ad", "position": "bottom-right" } });

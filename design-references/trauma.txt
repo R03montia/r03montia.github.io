@@ -1,0 +1,375 @@
+===== trauma =====
+
+--- CSS block 1 (8150 chars) ---
+@import url('https://fonts.googleapis.com/css2?family=Nixie+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+ 
+:root {
+    --body-bg: 225, 225, 225;
+    --content-bg: var(--global-white-color);
+    --bg-opacity: 0.9;
+ 
+    --extra-bg-1: url(https://imagebed.pro/images/liurd/skyline.svg);
+    --extra-bg-2: url(https://imagebed.pro/images/liurd/skyline.svg);
+    --extra-bg-3: url(https://imagebed.pro/images/liurd/skyline.svg);
+    --extra-opacity-1: 0.15;
+    --extra-opacity-2: 0.05;
+    --extra-opacity-3: 0.05;
+ 
+    --topbar-hover-bg: var(--dark-ui-bg), 0.2;
+    --topbar-hover-txt: var(--light-ui-txt);
+ 
+    --user-drop-txt: var(--dark-ui-txt);
+ 
+    --bottombar-bg: var(--dark-ui-bg);
+    --bottombar-txt: var(--dark-ui-txt);
+ 
+    --header-title: "SCP 基金会";
+ 
+    --banner-title: "FOUNDATION";
+    --banner-subtitle: "当色彩褪去的时候";
+ 
+    --header-height: 3rem;
+    --topbar-height: 2.5rem;
+    --dropdown-height: var(--topbar-height);
+    --banner-height: 25rem;
+ 
+    --header-ui-size: 3rem;
+ 
+    --header-title-size: 1.8rem;
+    --topbar-size: clamp(0.8em, calc(0.4rem + 0.8vw), 1em);
+    --banner-title-size: clamp(2rem, calc(2rem + 3.5vw), 6rem);
+    --banner-subtitle-size: 1rem;
+ 
+    --banner-font: "Nixie One", "Noto Serif SC", Franklin Gothic Medium, Franklin Gothic, ITC Franklin Gothic, Arial, serif;
+    --header-font: var(--banner-font);
+    --title-font: "Outfit", "Noto Sans SC", "Noto Sans TC", Franklin Gothic Medium, Franklin Gothic, ITC Franklin Gothic, Arial, sans-serif;
+    --body-font: "Atkinson Hyperlegible", "Noto Sans SC", "Noto Sans TC", Arimo, Verdana, Geneva, sans-serif;
+    --ui-font: "Outfit", "Noto Sans SC", "Noto Sans TC", Arimo, Verdana, Geneva, sans-serif;
+}
+ 
+#extra-div-1 {
+    position: fixed;
+    width: 100%;
+    height: 25vh;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    background-image: var(--extra-bg-1);
+    background-size: 20rem;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: var(--extra-opacity-1);
+}
+ 
+#extra-div-2 {
+    position: fixed;
+    width: 100%;
+    height: 50vh;
+    bottom: 0;
+    left: 0;
+    z-index: -2;
+    background-image: var(--extra-bg-2);
+    background-size: 40rem;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: var(--extra-opacity-2);
+}
+ 
+#extra-div-3 {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    bottom: 0;
+    left: 0;
+    z-index: -3;
+    background-image: var(--extra-bg-3);
+    background-size: contain;
+    background-repeat: repeat-x;
+    background-position: bottom;
+    opacity: var(--extra-opacity-3);
+}
+ 
+#container {
+    display: grid;
+    grid-template-columns: minmax(var(--sidebar-width), 1fr)auto 1fr;
+    grid-template-rows: auto auto auto auto;
+}
+ 
+#extrac-div-1 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--banner-font);
+    font-weight: 200;
+    width: 100%;
+    height: var(--banner-height);
+    color: rgb(var(--header-txt));
+    order: -1;
+}
+ 
+#extrac-div-1::before {
+    content: var(--banner-title);
+    font-size: var(--banner-title-size);
+}
+ 
+#extrac-div-1::after {
+    content: var(--banner-subtitle);
+    font-size: var(--banner-subtitle-size);
+}
+ 
+#header {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    min-width: var(--sidebar-width);
+    width: 100%;
+    height: fit-content;
+    grid-template-columns: var(--header-ui-size) 1fr auto auto;
+    grid-template-rows: var(--header-ui-size) calc(var(--banner-height) - var(--header-ui-size)) auto;
+    top: calc(0px - var(--banner-height));
+    order: -2;
+}
+ 
+#search-top-box {
+    grid-column: 3 / 4;
+    position: fixed;
+    right: var(--header-ui-size);
+    backdrop-filter: blur(1rem);
+}
+ 
+#login-status {
+    grid-column: 4 / 5;
+    position: fixed;
+    right: 0;
+    backdrop-filter: blur(1rem);
+}
+ 
+#header h1 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    height: var(--header-height);
+    position: static;
+}
+ 
+#header h1 a {
+    justify-content: flex-start;
+    padding: 0;
+    padding-left: 0.5rem;
+    transition: padding var(--global-duration);
+}
+ 
+#header h1 a:is(:hover, :focus) {
+    padding-left: 1rem;
+    transition: padding var(--global-hover-duration);
+}
+ 
+#header h2 {
+    display: none;
+}
+ 
+#header-extra-div-1 {
+    display: none;
+}
+ 
+#top-bar {
+    grid-column: 1 / 5;
+    grid-row: 3 / 4;
+    height: auto;
+}
+ 
+#top-bar > div > ul {
+    flex-direction: column;
+    height: auto;
+    margin-right: 0;
+}
+ 
+#top-bar > div > ul > li {
+    flex-basis: unset;
+    height: var(--topbar-height);
+}
+ 
+#top-bar > div > ul > li > a {
+    justify-content: flex-end;
+    padding: 0 1rem;
+}
+ 
+#top-bar > div > ul > :is(li, li:last-of-type) > ul {
+    top: 0;
+    left: 100%;
+    width: 32em;
+    max-width: max-content;
+    min-width: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+ 
+#top-bar > div > ul > li > ul > li {
+    width: 50%;
+    flex-grow: 1;
+}
+ 
+#top-bar > div > ul > :is(li, li:hover, li:focus, li.sfhover, li:focus-within) > ul > li > a {
+    box-sizing: border-box;
+}
+ 
+#content-wrap {
+    display: contents;
+}
+ 
+#side-bar {
+    max-height: unset;
+    overflow-y: auto;
+    border: unset;
+    box-shadow: 0 0 1.5rem -1rem rgb(var(--global-dark-color));
+}
+ 
+#side-bar::after {
+    backdrop-filter: blur(1rem);
+}
+ 
+#main-content {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    min-height: 100vh;
+    box-sizing: border-box;
+    margin: 0 auto 15vh;
+    padding: 1.5rem;
+    box-shadow: 0 0 2.5rem -1rem rgb(var(--global-dark-color));
+    position: relative;
+    background: rgba(var(--content-bg), var(--bg-opacity));
+}
+ 
+#main-content::after {
+    content: "控制，收容，保护.";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    color: rgb(var(--header-txt));
+    font-family: var(--banner-font);
+    font-weight: 200;
+}
+ 
+#page-title {
+    padding: 0;
+}
+ 
+:is(blockquote, .blockquote, div.blockquote, [class*=blockquote]) {
+    padding: 0.5rem 1rem;
+    border-width: 0 0 0 0.3rem;
+    background: rgba(var(--light-block-bg), 0.4);
+}
+ 
+#page-options-container {
+    font-family: var(--ui-font);
+}
+ 
+#footer {
+    grid-column: 1 / 4;
+    grid-row: 3 / 4;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    border: unset;
+}
+ 
+#license-area {
+    grid-column: 1 / 4;
+    grid-row: 4 / 5;
+    padding: 0.5rem;
+    justify-content: flex-end;
+}
+ 
+#license-area a {
+    color: rgb(var(--global-pale-color));
+}
+ 
+@media only screen and (max-width: 1024px) {
+  #container-wrap {
+    perspective-origin: 49.5% 5rem;
+  }
+ 
+  #container {
+    display: flex;
+  }
+ 
+  #header {
+    min-width: var(--sidebar-width);
+    grid-template-columns: var(--header-ui-size) 1fr auto auto;
+    grid-template-rows: var(--header-ui-size) auto auto;
+    top: 0;
+    width: initial;
+    position: static;
+  }
+ 
+  #content-wrap {
+    display: block;
+    margin: 0;
+  }
+ 
+  #login-status {
+    position: relative;
+    backdrop-filter: unset;
+  }
+ 
+  #search-top-box {
+    position: static;
+    backdrop-filter: unset;
+  }
+ 
+  #login-status #account-options {
+    left: initial;
+    right: 0;
+  }
+ 
+  #top-bar > div > ul {
+    flex-direction: row;
+    margin-right: auto;
+  }
+ 
+  #top-bar > div > ul > li {
+    flex-basis: min-content;
+  }
+ 
+  #top-bar > div > ul > li > a {
+    justify-content: center;
+    padding: 0;
+  }
+ 
+  #top-bar > div > ul > :is(li, li:last-of-type) > ul {
+    top: 100%;
+    left: 0;
+    width: auto;
+    flex-direction: column;
+  }
+ 
+  #top-bar > div > ul > li:last-of-type > ul {
+    left: initial;
+    right: 0;
+  }
+ 
+  #top-bar > div > ul > li > ul > li {
+    width: 100%;
+    flex-grow: 1;
+  }
+}
+ 
+@media only screen and (max-width: 768px) {
+    #top-bar > div > ul > :is(li, li:last-of-type) > ul {
+        flex-direction: row;
+    }
+    #top-bar > div > ul > li > ul > li {
+        width: 50%;
+    }
+}
+
+--- PAGE TEXT (2078 chars) ---
+Suprematism. 至上主义 真理隐于几何之间 创伤 是一个由 Liurd 基于 至上主义 制作的美学主题版式，可以被引用于任意页面。要在页面上引用这个版式，请在其中加入如下代码： [[include :scp-wiki-cn:theme:suprematism]] [[include :scp-wiki-cn:theme:trauma]] 以下为本版式的部分元素示例。 Fold Unfold Table of Contents 示例 1 级标题 2 级标题 3 级标题 4 级标题 5 级标题 6 级标题 预定义 示例 评分: +59 + – x 通过四个连字符 “ ---- ” 1 来在你的页面中创建水平分割线。若未被放在其他部件（诸如引用块）中，其会左右延伸贯穿整个页面。这种将文件分割为多个部分的线就是分割线。 《白上白》（马列维奇，1918） 可通过 1 至 6 个加号（“+”）来创建不同级的标题。 折叠 - 点击以展开 折叠 - 点击以收起 1 级标题 2 级标题 3 级标题 4 级标题 5 级标题 6 级标题 至上主义（俄语：супрематизм，英语：suprematism，或译作“绝对主义”）现代主义艺术流派之一，二十世纪初俄罗斯抽象绘画的主要流派。创始人为卡济米尔·谢韦里诺维奇·马列维奇（1878-1935）。“至上主义”一词来自于1915年马列维奇发表的宣言式小册子《从立体主义和未来主义到至上主义》（От Кубизма и Футуризма к Супрематизму）。在这本书中，马列维奇，强调至上主义是艺术中的绝对最高真理，它将取代此前一切曾经存在过的流派。人类社会可以以至上主义的原则进行组织和构建，进入新的历史发展阶段。至上主义的代表作品是马列维奇在1915年“0.10最后的未来主义展览”展出的油画《黑方块》。 至上主义的理论和创作对同时期的构成主义、以及欧洲的抽象绘画产生了重要的影响。 2 分页 分页 长 Tab 由于一些奇怪的原因，这个空 tab 有一个很长的名字，也就是“长而无物”，很糟的现象。 空 Tab 空 Tab 空 Tab 空 Tab 空 Tab 此为分页（tab view）。 看，这有更多文字。 多么精巧绝伦。 实际上这里有文字。 // 这是 表格 说实话 不写做法不太好。 但是解释起来很麻烦，你还是自己查一下吧。 这是一个引用块，在一行字的起始处加上“> ”来创建。 更多文字 一条分割线 嵌套引用块 [[div class="shadebox"]] 这个引用块的特点是引用块内的文字和引用块外的文字对齐。 [[div class="block"]] 这是一个基础的块级元素，通过为其添加更多的类（class）来进一步样式化。 与 shadebox 不兼容！ [[div class="block shadow"]] 这个引用块的特点是拥有阴影。 [[div class="block dropshadow"]] 同理，但是阴影更大一些。 [[div class="block light-bg"]] 较浅的背景。 [[div class="block dark-bg"]] 较深的背景。 这东西很烦人，不过嘛…有些时候它就是没法避免… Footnotes 1 . Placeholder McD 看到这个会很欣慰，大概。 2 . 至上主义 - 维基百科 3 . 注： 本预设额外使用了 Old Standard TT 作为横幅字体。 页眉和横幅字体为 Nixie One / 思源宋体。 标题和用户界面字体为 Outfit / 思源黑体。 正文字体为 Atkinson Hyperlegible / 思源黑体。 等宽字体为 PT Mono / 思源宋体。 预定义 创伤 内置了一些已经做好的预设，可以通过在引入时修改参数来改变其外观。 注意： 本版式与至上主义的绝大多数预设不兼容！ 预设： 灰色。 引用方式： 直接引入版式。 预设： 阵雨。 引用方式： |rainy=true 预设： 明黄。 引用方式： |yellow=true 预设： 深蓝。 3 引用方式： |blue=true 预设： 极简。 引用方式： |minimal=true 版式 CSS 代码 关闭 关闭 window['nitroAds'].createAd('wad-scp-wiki-cn-below-content-anchor', { "refreshTime": 30, "format": "anchor-v2", "anchor": "bottom", "anchorPersistClose": false, "mediaQuery": "(min-width: 0px)", "report": { "enabled": true, "icon": true, "wording": "Report Ad", "position": "bottom-right" } });
