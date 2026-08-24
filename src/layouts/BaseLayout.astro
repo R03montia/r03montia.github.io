@@ -5,6 +5,7 @@ import '@fontsource/atkinson-hyperlegible';
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
+import Skyline from '../components/Skyline.astro';
 
 interface Props {
   title: string;
@@ -39,9 +40,9 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
       </main>
     </div>
     <div class="silhouettes" aria-hidden="true">
-      <svg class="sky-l1" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V60h30V40h20v20h40V30h25v30h35V50h30v70zM260 120V45h28V25h18v20h30v25h40V35h26v85zM520 120V55h35V35h22v20h33V15h20v105zM740 120V50h30V30h20v20h35v50zM900 120V40h26V20h20v20h32v80zM1040 120V55h30V35h22v85z"/></svg>
-      <svg class="sky-l2" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V70h50V50h30v20h45V35h28v85zM180 120V60h35V40h22v80zM300 120V45h40V25h20v95zM420 120V65h45V45h25v75zM560 120V50h30V30h24v90zM700 120V70h40V50h26v70zM840 120V40h35V20h22v100zM980 120V60h42V42h26v78zM1110 120V50h34V32h24v88z"/></svg>
-      <svg class="sky-l3" preserveAspectRatio="none" viewBox="0 0 1200 120"><path fill="rgb(var(--text))" d="M0 120V85h60V65h35v20h50V55h32v65zM250 120V75h45V58h26v62zM400 120V90h55V68h30v52zM560 120V72h40V56h28v64zM720 120V82h48V64h30v56zM900 120V68h42V52h28v68zM1060 120V78h50V60h30v60z"/></svg>
+      <div class="sky-l1"><Skyline /></div>
+      <div class="sky-l2"><Skyline /></div>
+      <div class="sky-l3"><Skyline /></div>
     </div>
     <div class="rain-overlay" aria-hidden="true"></div>
     <slot name="after-main" />
