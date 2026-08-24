@@ -1,3 +1,57 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env / local secrets
+.env
+.env.local
+.env.*.local
+
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 .astro/
+
+# Local-only agent instructions
+AGENT.md
+AGENTS.md
+
+# HEIC wallpaper source (keep the PNG)
+public/wallpaper.heic
+docs/wallpaper.heic
