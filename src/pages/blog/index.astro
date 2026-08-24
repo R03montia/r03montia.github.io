@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { sortPosts } from '../../utils/posts';
+
+const posts = sortPosts(await getCollection('blog'));
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+---
+<BaseLayout title="博客 | R03montia" description="全部文章。">
+  <h1 class="page-title">博客</h1>
+  <div class="tag-row">
+    {allTags.map((t) => <a class="tag-pill" href={`/tag/${t}/`}>#{t}</a>)}
+  </div>
+  <div class="post-list">
+    {posts.map((p) => <PostCard post={p} />)}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-title { font-family: var(--font-ui); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.5rem; }
+  .tag-pill {
+    font-size: 0.8rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgb(var(--line) / 0.5);
+    color: rgb(var(--text-secondary));
+  }
+  .post-list { display: grid; gap: 0.9rem; }
+</style>
