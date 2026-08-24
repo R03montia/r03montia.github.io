@@ -13,7 +13,7 @@ interface Props {
 const { title, description = 'R03montia 的个人站点。' } = Astro.props;
 ---
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-rainy>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,7 +30,7 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
       })();
     </script>
   </head>
-  <body data-rainy>
+  <body>
     <a class="skip-link" href="#main-content">跳到主内容</a>
     <div class="app">
       <Sidebar />
@@ -47,13 +47,15 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
     <slot name="after-main" />
     <MobileNav />
     <script>
-      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const toggleTheme = () => {
         const root = document.documentElement;
         const dark = root.getAttribute('data-theme') !== 'dark';
         if (dark) root.setAttribute('data-theme', 'dark');
         else root.removeAttribute('data-theme');
         localStorage.setItem('theme', dark ? 'dark' : 'light');
-      });
+      };
+      document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+      document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
     </script>
   </body>
 </html>

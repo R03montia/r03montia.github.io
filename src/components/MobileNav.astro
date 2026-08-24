@@ -13,6 +13,7 @@ const isActive = (href: string) =>
   {items.map((it) => (
     <a href={it.href} class:list={[{ active: isActive(it.href) }]} aria-current={isActive(it.href) ? 'page' : undefined}>{it.label}</a>
   ))}
+  <button id="theme-toggle-mobile" type="button" aria-label="切换明暗模式">明 / 暗</button>
 </nav>
 
 <style>
@@ -35,5 +36,14 @@ const isActive = (href: string) =>
     }
     .mobile-nav a { color: rgb(var(--text-secondary)); padding: 0.25rem 0.75rem; }
     .mobile-nav a.active { color: rgb(var(--text)); }
+    #theme-toggle-mobile {
+      border: none;
+      background: transparent;
+      color: rgb(var(--text-secondary));
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.75rem;
+    }
   }
 </style>
