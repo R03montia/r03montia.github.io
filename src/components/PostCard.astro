@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { readingTime } from '../utils/posts';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const { title, date, tags, description } = post.data;
+const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<a class="post-card card" href={`/blog/${post.id}/`}>
+  <div class="pc-head">
+    <h3>{title}</h3>
+    <time datetime={date.toISOString()}>{fmt.format(date)}</time>
+  </div>
+  <p class="pc-desc">{description}</p>
+  <div class="pc-meta">
+    <span>约 {readingTime(post.body ?? '')} 分钟</span>
+    {tags.map((t) => <span class="tag">#{t}</span>)}
+  </div>
+</a>
+
+<style>
+  .post-card {
+    display: block;
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    color: inherit;
+    transition: transform 0.15s ease;
+  }
+  .post-card:hover { text-decoration: none; transform: translateY(-2px); }
+  .pc-head { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+  h3 { margin: 0; font-family: var(--font-ui); font-size: 1.05rem; }
+  time { color: rgb(var(--text-secondary)); font-size: 0.8rem; white-space: nowrap; }
+  .pc-desc { color: rgb(var(--text-secondary)); font-size: 0.9rem; margin: 0.4rem 0 0.6rem; }
+  .pc-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.78rem; color: rgb(var(--text-secondary)); }
+  .tag { color: rgb(var(--accent)); }
+</style>
