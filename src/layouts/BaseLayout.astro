@@ -10,7 +10,7 @@ interface Props {
   title: string;
   description?: string;
 }
-const { title, description = 'R03montia 的个人站点。' } = Astro.props;
+const { title, description = '大baka 的个人站点。' } = Astro.props;
 ---
 <!doctype html>
 <html lang="zh-CN" data-rainy>
@@ -19,7 +19,7 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title="R03montia" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="大baka" href="/rss.xml" />
     <title>{title}</title>
     <script is:inline>
       (() => {

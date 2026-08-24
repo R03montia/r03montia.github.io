@@ -5,8 +5,8 @@ import { sortPosts } from '../utils/posts';
 export async function GET(context) {
   const posts = sortPosts(await getCollection('blog'));
   return rss({
-    title: 'R03montia',
-    description: 'R03montia 的个人站点。',
+    title: '大baka',
+    description: '大baka 的个人站点。',
     site: context.site,
     items: posts.map((post) => ({
       title: post.data.title,

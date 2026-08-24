@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 const posts = sortPosts(await getCollection('blog', (p) => p.data.tags.includes(tag!)));
 ---
-<BaseLayout title={`#${tag} | R03montia`} description={`标签 #${tag} 下的全部文章。`}>
+<BaseLayout title={`#${tag} | 大baka`} description={`标签 #${tag} 下的全部文章。`}>
   <h1 class="page-title">#{tag}</h1>
   <p><a href="/blog/">← 返回全部文章</a></p>
   <div class="post-list">

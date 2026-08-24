@@ -7,7 +7,7 @@ import { sortPosts } from '../../utils/posts';
 const posts = sortPosts(await getCollection('blog'));
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 ---
-<BaseLayout title="博客 | R03montia" description="全部文章。">
+<BaseLayout title="博客 | 大baka" description="全部文章。">
   <h1 class="page-title">博客</h1>
   <div class="tag-row">
     {allTags.map((t) => <a class="tag-pill" href={`/tag/${t}/`}>#{t}</a>)}
