@@ -51,6 +51,10 @@ dist/
 # Local-only agent instructions
 AGENT.md
 AGENTS.md
+CLAUDE.md
+
+# Local agent planning / spec docs
+docs/superpowers/
 
 # HEIC wallpaper source (keep the PNG)
 public/wallpaper.heic
