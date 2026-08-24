@@ -56,6 +56,9 @@ CLAUDE.md
 # Local agent planning / spec docs
 docs/superpowers/
 
+# Local design reference material
+design-references/
+
 # HEIC wallpaper source (keep the PNG)
 public/wallpaper.heic
 docs/wallpaper.heic
