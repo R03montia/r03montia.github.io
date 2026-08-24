@@ -94,14 +94,6 @@ a:hover {
   background-repeat: repeat-x;
   background-position: bottom center;
 }
-.sky-l2 {
-  height: 50vh;
-  opacity: var(--extra-opacity-2, 0.05);
-  background-image: url(/skyline.svg);
-  background-size: 40rem;
-  background-repeat: repeat-x;
-  background-position: bottom center;
-}
 .sky-l3 {
   height: 100vh;
   opacity: var(--extra-opacity-3, 0.05);
