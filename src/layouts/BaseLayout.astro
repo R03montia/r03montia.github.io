@@ -14,7 +14,7 @@ interface Props {
 const { title, description = 'R03montia 的个人站点。' } = Astro.props;
 ---
 <!doctype html>
-<html lang="zh-CN" data-rainy>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +28,9 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.toggleAttribute('data-theme', dark);
         if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+        const savedRain = localStorage.getItem('rain');
+        const rainy = savedRain ? savedRain === 'on' : true;
+        document.documentElement.toggleAttribute('data-rainy', rainy);
       })();
     </script>
   </head>
@@ -53,8 +56,24 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         else root.removeAttribute('data-theme');
         localStorage.setItem('theme', dark ? 'dark' : 'light');
       };
+      const syncRain = () => {
+        const on = document.documentElement.hasAttribute('data-rainy');
+        document.querySelectorAll('.rain-label').forEach((el) => {
+          el.textContent = on ? '开' : '关';
+        });
+      };
+      const toggleRain = () => {
+        const root = document.documentElement;
+        if (root.hasAttribute('data-rainy')) root.removeAttribute('data-rainy');
+        else root.setAttribute('data-rainy', '');
+        localStorage.setItem('rain', root.hasAttribute('data-rainy') ? 'on' : 'off');
+        syncRain();
+      };
       document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
       document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
+      document.getElementById('rain-toggle')?.addEventListener('click', toggleRain);
+      document.getElementById('rain-toggle-mobile')?.addEventListener('click', toggleRain);
+      syncRain();
     </script>
   </body>
 </html>

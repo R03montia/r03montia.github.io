@@ -30,7 +30,10 @@ const isActive = (href: string) =>
   </nav>
   <div class="side-foot">
     <a class="social" href="https://github.com/R03montia" target="_blank" rel="noopener noreferrer">GitHub</a>
-    <button id="theme-toggle" type="button" aria-label="切换明暗模式">明 / 暗</button>
+    <div class="side-toggles">
+      <button id="theme-toggle" type="button" aria-label="切换明暗模式">明 / 暗</button>
+      <button id="rain-toggle" type="button" aria-label="切换下雨效果">雨：<span class="rain-label">开</span></button>
+    </div>
   </div>
 </aside>
 
@@ -65,8 +68,10 @@ const isActive = (href: string) =>
   .side-link.active { background: rgb(var(--content-bg) / 0.9); box-shadow: 0 1px 0 rgb(var(--line) / 0.4); }
   .side-link svg { width: 17px; height: 17px; }
   .side-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+  .side-toggles { display: flex; gap: 0.4rem; }
   .social { color: rgb(var(--text-secondary)); }
-  #theme-toggle {
+  #theme-toggle,
+  #rain-toggle {
     border: 1px solid rgb(var(--line) / 0.6);
     background: rgb(var(--content-bg) / 0.6);
     color: rgb(var(--text));

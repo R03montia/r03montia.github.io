@@ -14,6 +14,7 @@ const isActive = (href: string) =>
     <a href={it.href} class:list={[{ active: isActive(it.href) }]} aria-current={isActive(it.href) ? 'page' : undefined}>{it.label}</a>
   ))}
   <button id="theme-toggle-mobile" type="button" aria-label="切换明暗模式">明 / 暗</button>
+  <button id="rain-toggle-mobile" type="button" aria-label="切换下雨效果">雨：<span class="rain-label">开</span></button>
 </nav>
 
 <style>
@@ -36,7 +37,8 @@ const isActive = (href: string) =>
     }
     .mobile-nav a { color: rgb(var(--text-secondary)); padding: 0.25rem 0.75rem; }
     .mobile-nav a.active { color: rgb(var(--text)); }
-    #theme-toggle-mobile {
+    #theme-toggle-mobile,
+    #rain-toggle-mobile {
       border: none;
       background: transparent;
       color: rgb(var(--text-secondary));
