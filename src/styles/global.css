@@ -1,12 +1,12 @@
 /* ===== trauma 版式 · RGB 三元组色彩系统 ===== */
 :root {
-  /* 默认亮色 */
-  --body-bg: 225, 225, 225;
-  --content-bg: 255, 255, 255;
-  --text: 35, 35, 38;
-  --text-secondary: 110, 110, 115;
-  --line: 160, 160, 165;
-  --accent: 90, 100, 130;
+  /* 默认亮色（空格分隔，供 rgb(var(--x) / alpha) 现代语法使用）*/
+  --body-bg: 225 225 225;
+  --content-bg: 255 255 255;
+  --text: 35 35 38;
+  --text-secondary: 110 110 115;
+  --line: 160 160 165;
+  --accent: 90 100 130;
 
   --font-deco: 'Nixie One', 'Outfit', serif;
   --font-ui: 'Outfit', 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -16,21 +16,21 @@
 
 /* 暗色模式 */
 [data-theme='dark'] {
-  --body-bg: 24, 26, 28;
-  --content-bg: 33, 36, 39;
-  --text: 200, 202, 206;
-  --text-secondary: 140, 142, 148;
-  --line: 70, 74, 80;
-  --accent: 130, 145, 185;
+  --body-bg: 24 26 28;
+  --content-bg: 33 36 39;
+  --text: 200 202 206;
+  --text-secondary: 140 142 148;
+  --line: 70 74 80;
+  --accent: 130 145 185;
 }
 
 /* rainy 预设：冷灰蓝调 */
 [data-rainy] {
-  --body-bg: 205, 212, 220;
-  --accent: 70, 90, 125;
+  --body-bg: 205 212 220;
+  --accent: 70 90 125;
 }
 [data-theme='dark'][data-rainy] {
-  --body-bg: 18, 21, 26;
+  --body-bg: 18 21 26;
 }
 
 * {
@@ -99,68 +99,30 @@ a:hover {
 
 
 /* ===== rainy 雨幕层 =====
-   参数实测自 trauma 版式 rainy 预设截图：近垂直细雨丝（约 2px 宽、100px 长）、
-   稀疏随机分布、低透明度。两组不同周期/相位的竖条纹叠加出稀疏错落感，
-   只有两组条纹交叠处才露出雨丝，避免形成均匀纱墙。 */
-.rain-overlay {
+   原版 trauma 阵雨实现（#extra-div-4）：一张随机散布长短不一黑雨丝的 100px 无缝瓦片
+   traumarain.svg。background-size 平铺，纵向滚动恰为一个瓦片高度 → 像素级无缝下落；
+   radial mask 让雨向中心渐弱、只在四周；暗色模式整体反色为白雨丝。 */
+[data-rainy] .rain-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 1;
+  background-image: url(/images/traumarain.svg);
+  background-size: 15rem;
+  mask: radial-gradient(transparent, black);
+  -webkit-mask: radial-gradient(transparent, black);
+  opacity: 0.4;
+  animation: rain-fall 0.2s linear infinite;
 }
-.rain-overlay::before,
-.rain-overlay::after {
-  content: '';
-  position: absolute;
-  inset: -10rem 0;
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      rgb(var(--text) / 0.45) 0 6.25rem,
-      transparent 6.25rem 14rem
-    ),
-    repeating-linear-gradient(
-      to right,
-      #000 0 2px,
-      transparent 2px 3.4rem
-    );
-  mask-image: repeating-linear-gradient(
-      to right,
-      #000 0 2px,
-      transparent 2px 5.1rem
-    );
-  background-size: auto auto, auto 100%;
-  animation: rainfall-a 1s linear infinite;
+@keyframes rain-fall {
+  from { background-position: 0 0; }
+  to { background-position: 0 15rem; }
 }
-.rain-overlay::after {
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      rgb(var(--text) / 0.32) 0 4rem,
-      transparent 4rem 11.5rem
-    ),
-    repeating-linear-gradient(
-      to right,
-      #000 0 2px,
-      transparent 2px 3.9rem
-    );
-  mask-image: repeating-linear-gradient(
-      to right,
-      #000 0 2px,
-      transparent 2px 6.2rem
-    );
-  animation: rainfall-b 0.75s linear infinite;
-}
-@keyframes rainfall-a {
-  from { transform: translateY(-14rem); }
-  to { transform: translateY(0); }
-}
-@keyframes rainfall-b {
-  from { transform: translateY(-11.5rem) translateX(1.7rem); }
-  to { transform: translateY(0) translateX(1.7rem); }
+[data-theme='dark'][data-rainy] .rain-overlay {
+  filter: invert(1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .rain-overlay { animation: none; }
+  [data-rainy] .rain-overlay { animation: none; }
 }
 
 .skip-link {

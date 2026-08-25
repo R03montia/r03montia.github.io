@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100"
+   height="100"
+   viewBox="0 0 100 100"
+   id="SVGRoot"
+   version="1.1"
+   enable-background="new"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4787">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="patternClipPath">
+      <rect
+         y="0"
+         x="0"
+         height="100"
+         width="100"
+         id="clipPathRect"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:1.0989;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </clipPath>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend"
+       style="overflow:visible">
+      <path
+         id="path19572"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6)" />
+    </marker>
+  </defs>
+  <g
+     id="patternLayer"
+     style="display:inline">
+    <use
+       style="opacity:0.3"
+       height="100%"
+       width="100%"
+       id="phantomBottom"
+       xlink:href="#designBottom"
+       y="0"
+       x="0" />
+    <g
+       id="infoGroup">
+      <rect
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:76.9908;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+         id="rect4130"
+         width="526.66248"
+         height="360.00635"
+         x="-348.83969"
+         y="-380.86212" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Verdana;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         x="-326.82172"
+         y="-349.80621"
+         id="text8664"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:23.6686px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+           id="tspan8666"
+           x="-326.82172"
+           y="-349.80621">Seamless pattern</tspan></text>
+      <flowRoot
+         xml:space="preserve"
+         id="infoText"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         transform="translate(-709.3014,-231.7039)"><flowRegion
+           id="flowRegion11597"><rect
+             ry="0.97061312"
+             id="rect11599"
+             width="491.7114"
+             height="324.99371"
+             x="383.75671"
+             y="-110.4523"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;font-family:sans-serif;-inkscape-font-specification:sans-serif" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara6756">Use the layers &quot;<flowSpan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:'Cantarell Bold'"
+   id="flowSpan7476">Pattern Foreground</flowSpan>&quot; and &quot;<flowSpan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:'Cantarell Bold'"
+   id="flowSpan7478">Pattern Background</flowSpan>&quot; on the pattern page to create your design. The separation into two layers will make it easier for you to create and edit overlapping content like a foreground drawing with a background fill.</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7456"> </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7458">The layer named &quot;<flowSpan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:'Cantarell Bold'"
+   id="flowSpan7480">Pattern</flowSpan>&quot; is for using the seamless pattern, copying it to other documents, adding opacity etc. </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7460">Select the group on the page, and use <flowSpan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:'Cantarell Bold'"
+   id="flowSpan7484">Object-&gt;Pattern-&gt;Objects to Pattern</flowSpan> to convert your creation into a fill pattern.</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7462"> </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7464">The layer &quot;<flowSpan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:'Cantarell Bold'"
+   id="flowSpan7482">Preview Background</flowSpan>&quot; provides an easy way to preview your creation if it contains transparency.</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7466">Changing this layer's visibility will not alter the pattern.</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7468"> </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7470">If an object is moved outside the pattern/page limits, it will be difficult to select it. </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7472">To move it back onto the page, select the object using the rubberband selection (click and drag a selection box) with the selection tool.</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Cantarell;-inkscape-font-specification:Cantarell"
+           id="flowPara7474">Then move it back onto the page, using the arrow keys or the &quot;Align and Distribute&quot; dialog (Shift+Ctrl+A).</flowPara></flowRoot>
+      <path
+         id="path19539"
+         d="m -354.4906,-359.49 h -6.1704 V 51.51566 h 229.6052"
+         style="color:#000000;text-decoration:none;text-decoration-line:none;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#000000;stroke-width:3.77953;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-end:url(#Arrow2Mend);enable-background:accumulate" />
+    </g>
+    <g
+       clip-path="url(#patternClipPath)"
+       id="fullPattern"
+       style="display:inline">
+      <g
+         id="designBottom"
+         style="display:inline">
+        <rect
+           y="0"
+           x="0"
+           height="100"
+           width="100"
+           id="rect9111"
+           style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:url(#radialGradient3070);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0;marker:none;enable-background:accumulate" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect1"
+           width="0.88388348"
+           height="19.445436"
+           x="4.5961943"
+           y="48.967144" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect2"
+           width="1.4142135"
+           height="24.395184"
+           x="53.563339"
+           y="18.031223" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect3"
+           width="1.0606601"
+           height="27.577164"
+           x="82.731491"
+           y="67.351921" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect4"
+           width="1"
+           height="20.25"
+           x="89.75"
+           y="9.5" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect5"
+           width="0.75"
+           height="10.5"
+           x="29.75"
+           y="12.25" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect6"
+           width="0.5"
+           height="6"
+           x="71.5"
+           y="66" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect8"
+           width="0.53033006"
+           height="6.1871843"
+           x="93.51487"
+           y="44.724503" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect9"
+           width="0.53033006"
+           height="3.7123106"
+           x="11.136931"
+           y="27.577164" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect18"
+           width="1.0606601"
+           height="11.844039"
+           x="22.097088"
+           y="79.549515" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect19"
+           width="0.70710677"
+           height="10.429825"
+           x="59.750523"
+           y="81.140503" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect20"
+           width="0.88388348"
+           height="8.6620579"
+           x="31.112698"
+           y="39.59798" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect22"
+           width="0.88388348"
+           height="8.1317282"
+           x="67.528694"
+           y="5.4800777" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect23"
+           width="0.70710677"
+           height="4.4194174"
+           x="2.2980971"
+           y="3.5355339" />
+        <rect
+           style="fill:#000000;stroke:none;stroke-width:6.613;stroke-linecap:round"
+           id="rect24"
+           width="1.0606601"
+           height="11.313708"
+           x="11.313708"
+           y="86.443802" />
+      </g>
+      <g
+         id="designTop"
+         style="display:inline" />
+      <g
+         id="designBottomGenerator">
+        <use
+           height="100%"
+           width="100%"
+           id="bottom1"
+           transform="translate(-100,-100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom2"
+           transform="translate(0,-100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom3"
+           transform="translate(100,-100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom4"
+           transform="translate(-100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom5"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom6"
+           transform="translate(100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom7"
+           transform="translate(-100,100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="bottom8"
+           transform="translate(0,100)"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+        <use
+           transform="translate(100,100)"
+           height="100%"
+           width="100%"
+           id="bottom9"
+           xlink:href="#designBottom"
+           y="0"
+           x="0" />
+      </g>
+      <g
+         id="designTopGenerator">
+        <use
+           height="100%"
+           width="100%"
+           id="top1"
+           transform="translate(-100,-100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top2"
+           transform="translate(0,-100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top3"
+           transform="translate(100,-100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top4"
+           transform="translate(-100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top5"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top6"
+           transform="translate(100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top7"
+           transform="translate(-100,100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           height="100%"
+           width="100%"
+           id="top8"
+           transform="translate(0,100)"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+        <use
+           transform="translate(100,100)"
+           height="100%"
+           width="100%"
+           id="top9"
+           xlink:href="#designTop"
+           y="0"
+           x="0" />
+      </g>
+    </g>
+  </g>
+</svg>
