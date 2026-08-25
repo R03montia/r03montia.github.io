@@ -9,9 +9,9 @@ const current = Astro.url.pathname;
 const isActive = (href: string) =>
   href === '/' ? current === '/' : current.startsWith(href);
 ---
-<nav class="mobile-nav" aria-label="移动端导航">
+<nav class="mobile-nav" aria-label="移动端导航" transition:persist>
   {items.map((it) => (
-    <a href={it.href} class:list={[{ active: isActive(it.href) }]} aria-current={isActive(it.href) ? 'page' : undefined}>{it.label}</a>
+    <a href={it.href} class:list={[{ active: isActive(it.href) }]} data-nav-link aria-current={isActive(it.href) ? 'page' : undefined}>{it.label}</a>
   ))}
   <button id="theme-toggle-mobile" type="button" aria-label="切换明暗模式">明 / 暗</button>
   <button id="rain-toggle-mobile" type="button" aria-label="切换下雨效果">雨：<span class="rain-label">开</span></button>

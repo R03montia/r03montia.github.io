@@ -6,6 +6,7 @@ import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
 import Skyline from '../components/Skyline.astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -22,6 +23,7 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title="R03montia" href="/rss.xml" />
     <title>{title}</title>
+    <ClientRouter />
     <script is:inline>
       (() => {
         const saved = localStorage.getItem('theme');
@@ -42,10 +44,10 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         <slot />
       </main>
     </div>
-    <div class="silhouettes" aria-hidden="true">
+    <div class="silhouettes" aria-hidden="true" transition:persist>
       <div class="sky-l1"><Skyline /></div>
     </div>
-    <div class="rain-overlay" aria-hidden="true"></div>
+    <div class="rain-overlay" aria-hidden="true" transition:persist></div>
     <slot name="after-main" />
     <MobileNav />
     <script>
@@ -74,7 +76,70 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
       document.getElementById('rain-toggle')?.addEventListener('click', toggleRain);
       document.getElementById('rain-toggle-mobile')?.addEventListener('click', toggleRain);
       syncRain();
+
+      // Astro 切页时 swapRootAttributes 会剥掉 <html> 上除 data-astro-transition*
+      // 之外的全部属性，再用新文档的属性覆盖。新文档是构建时静态产物，
+      // data-theme / data-rainy 是 head 脚本运行时才设的，没法在 HTML 里。
+      // 解决：在 swap 前把当前 <html> 上的这两个属性复制到 newDocument 的根上，
+      // swap 会把它们一起沿用过来。同步 syncRain 是因为持久化 MobileNav 的
+      // 「开/关」文字标签也是构建时的旧值，需要按当前实际状态刷新。
+      const persistThemeRain = (event: Event) => {
+        const newDoc = (event as CustomEvent & { newDocument?: Document }).newDocument;
+        if (!newDoc) return;
+        const cur = document.documentElement;
+        const next = newDoc.documentElement;
+        if (cur.hasAttribute('data-theme')) {
+          next.setAttribute('data-theme', cur.getAttribute('data-theme')!);
+        }
+        if (cur.hasAttribute('data-rainy')) {
+          next.setAttribute('data-rainy', '');
+        }
+      };
+      document.addEventListener('astro:before-swap', persistThemeRain);
+
+      // 持久化导航的 active 高亮：transition:persist 让侧栏/底栏不重渲染，
+      // 但导航高亮是构建时按 URL 算的，需要在切页后根据新 URL 重新同步。
+      const updateNavActive = () => {
+        const path = location.pathname;
+        const isActive = (href: string) =>
+          href === '/' ? path === '/' : path.startsWith(href);
+        document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]').forEach((a) => {
+          const href = a.getAttribute('href') || '';
+          const active = isActive(href);
+          a.classList.toggle('active', active);
+          if (active) a.setAttribute('aria-current', 'page');
+          else a.removeAttribute('aria-current');
+        });
+      };
+      document.addEventListener('astro:after-swap', updateNavActive);
+      updateNavActive();
     </script>
+    <style is:global>
+      /* 页面切换：模糊淡入淡出 */
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 220ms;
+        animation-timing-function: ease-out;
+      }
+      ::view-transition-old(root) {
+        animation-name: page-blur-out;
+      }
+      ::view-transition-new(root) {
+        animation-name: page-blur-in;
+      }
+      @keyframes page-blur-out {
+        to { opacity: 0; filter: blur(4px); }
+      }
+      @keyframes page-blur-in {
+        from { opacity: 0; filter: blur(8px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+          animation: none !important;
+        }
+      }
+    </style>
   </body>
 </html>
 
