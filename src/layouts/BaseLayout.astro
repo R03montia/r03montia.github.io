@@ -4,7 +4,6 @@ import '@fontsource/outfit';
 import '@fontsource/atkinson-hyperlegible';
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
-import MobileNav from '../components/MobileNav.astro';
 import Skyline from '../components/Skyline.astro';
 import { ClientRouter } from 'astro:transitions';
 
@@ -49,7 +48,13 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
     </div>
     <div class="rain-overlay" aria-hidden="true" transition:persist></div>
     <slot name="after-main" />
-    <MobileNav />
+    <header class="mobile-topbar">
+      <button id="menu-toggle" type="button" aria-controls="main-sidebar" aria-expanded="false" aria-label="打开菜单">
+        <span class="hamb"><span></span><span></span><span></span></span>
+      </button>
+      <a class="mobile-brand" href="/">R03montia</a>
+    </header>
+    <div id="drawer-backdrop"></div>
     <script>
       const toggleTheme = () => {
         const root = document.documentElement;
@@ -71,17 +76,13 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         localStorage.setItem('rain', root.hasAttribute('data-rainy') ? 'on' : 'off');
         syncRain();
       };
-      document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
-      document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
-      document.getElementById('rain-toggle')?.addEventListener('click', toggleRain);
-      document.getElementById('rain-toggle-mobile')?.addEventListener('click', toggleRain);
       syncRain();
 
       // Astro 切页时 swapRootAttributes 会剥掉 <html> 上除 data-astro-transition*
       // 之外的全部属性，再用新文档的属性覆盖。新文档是构建时静态产物，
       // data-theme / data-rainy 是 head 脚本运行时才设的，没法在 HTML 里。
       // 解决：在 swap 前把当前 <html> 上的这两个属性复制到 newDocument 的根上，
-      // swap 会把它们一起沿用过来。同步 syncRain 是因为持久化 MobileNav 的
+      // swap 会把它们一起沿用过来。同步 syncRain 是因为侧栏上持久化的
       // 「开/关」文字标签也是构建时的旧值，需要按当前实际状态刷新。
       const persistThemeRain = (event: Event) => {
         const newDoc = (event as CustomEvent & { newDocument?: Document }).newDocument;
@@ -95,8 +96,6 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
           next.setAttribute('data-rainy', '');
         }
       };
-      document.addEventListener('astro:before-swap', persistThemeRain);
-
       // 持久化导航的 active 高亮：transition:persist 让侧栏/底栏不重渲染，
       // 但导航高亮是构建时按 URL 算的，需要在切页后根据新 URL 重新同步。
       const updateNavActive = () => {
@@ -111,7 +110,38 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
           else a.removeAttribute('aria-current');
         });
       };
-      document.addEventListener('astro:after-swap', updateNavActive);
+      // 移动端汉堡抽屉 + 明暗/雨开关：全部用 document 事件委托，并通过 window
+      // 一次性标记保证只在首帧绑定一次。Astro 切页时模块脚本会重跑：直接给
+      // 元素绑监听会让持久化元素（侧栏开关按钮）叠加监听；而新页面按钮在
+      // ~220ms 过渡期间还没绑上监听，导致"偶尔点汉堡没反应"。委托 + 只绑一次两者兼治。
+      if (!(window as unknown as { __siteUI?: boolean }).__siteUI) {
+        (window as unknown as { __siteUI: boolean }).__siteUI = true;
+        const setMenu = (open: boolean) => {
+          const root = document.body;
+          root.classList.toggle('menu-open', open);
+          root.style.overflow = open ? 'hidden' : '';
+          const toggler = document.getElementById('menu-toggle');
+          toggler?.setAttribute('aria-expanded', String(open));
+          toggler?.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        };
+        document.addEventListener('click', (e) => {
+          const el = e.target as Element | null;
+          const hit = (sel: string) => el?.closest(sel);
+          if (hit('#menu-toggle')) setMenu(!document.body.classList.contains('menu-open'));
+          else if (hit('#drawer-backdrop')) setMenu(false);
+          else if (hit('[data-nav-link]')) setMenu(false);
+          else if (hit('#theme-toggle')) toggleTheme();
+          else if (hit('#rain-toggle')) toggleRain();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') setMenu(false);
+        });
+        document.addEventListener('astro:before-swap', persistThemeRain);
+        document.addEventListener('astro:after-swap', () => {
+          setMenu(false);
+          updateNavActive();
+        });
+      }
       updateNavActive();
     </script>
     <style is:global>
@@ -140,6 +170,112 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         }
       }
     </style>
+    <style is:global>
+      .mobile-topbar { display: none; }
+      #drawer-backdrop { display: none; }
+      @media (max-width: 48rem) {
+        .mobile-topbar {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3.2rem;
+          z-index: 40;
+          padding: 0 1rem;
+          background: rgb(var(--content-bg) / 0.45);
+          backdrop-filter: blur(1rem);
+          -webkit-backdrop-filter: blur(1rem);
+          box-shadow: 0 0 1.5rem -0.75rem rgba(0, 0, 0, 0.4);
+          border-bottom: 1px solid rgb(var(--line) / 0.4);
+          color: rgb(var(--text));
+          font-family: var(--font-ui);
+          font-size: 1rem;
+        }
+        .mobile-brand { color: inherit; letter-spacing: 0.05em; font-size: 1.05rem; }
+        .mobile-topbar button#menu-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.75rem;
+          height: 2.75rem;
+          flex-shrink: 0;
+          padding: 0;
+          border: 1px solid rgb(var(--line) / 0.4);
+          border-radius: 8px;
+          background: rgb(var(--content-bg) / 0.5);
+          color: rgb(var(--text));
+          cursor: pointer;
+          touch-action: manipulation;
+        }
+        .hamb { position: relative; display: block; width: 18px; height: 14px; }
+        .hamb span {
+          position: absolute;
+          left: 0;
+          width: 18px;
+          height: 2px;
+          background: currentColor;
+          border-radius: 1px;
+          transition: top 0.2s ease-out, transform 0.2s ease-out, opacity 0.2s ease-out;
+        }
+        .hamb span:nth-child(1) { top: 0; }
+        .hamb span:nth-child(2) { top: 6px; }
+        .hamb span:nth-child(3) { top: 12px; }
+        body.menu-open .hamb span:nth-child(1) { top: 6px; transform: rotate(45deg); }
+        body.menu-open .hamb span:nth-child(2) { opacity: 0; }
+        body.menu-open .hamb span:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
+        #main-sidebar {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: min(15rem, 82vw);
+          z-index: 30;
+          height: auto;
+          transform: translateX(-100%);
+          visibility: hidden;
+          transition: transform 0.25s ease-out, visibility 0.25s;
+          background: rgb(var(--content-bg) / 0.45);
+          backdrop-filter: blur(1rem);
+          -webkit-backdrop-filter: blur(1rem);
+          box-shadow: 0 0 2.5rem -1rem rgba(0, 0, 0, 0.45);
+          border-right: 1px solid rgb(var(--line) / 0.4);
+          padding-top: calc(3.2rem + env(safe-area-inset-top));
+          padding-right: 1.25rem;
+          padding-left: 1.25rem;
+          padding-bottom: 2rem;
+        }
+        body.menu-open #main-sidebar {
+          transform: translateX(0);
+          visibility: visible;
+        }
+        #main-sidebar .brand { display: none; }
+        #main-sidebar nav { overflow-y: auto; }
+        #main-sidebar .side-foot { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+        #drawer-backdrop {
+          display: block;
+          position: fixed;
+          inset: 0;
+          z-index: 25;
+          background: rgb(0 0 0 / 0.4);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.25s ease-out, visibility 0.25s;
+        }
+        body.menu-open #drawer-backdrop {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+      @media (max-width: 48rem) and (prefers-reduced-motion: reduce) {
+        #main-sidebar, #drawer-backdrop { transition: none; }
+        .hamb span { transition: none; }
+      }
+    </style>
   </body>
 </html>
 
@@ -156,7 +292,6 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
   }
   @media (max-width: 48rem) {
     .app { display: block; }
-    :global(.sidebar) { display: none; }
-    .main-area { padding-top: 1.5rem; }
+    .main-area { padding-top: calc(3.2rem + 1.5rem); }
   }
 </style>
