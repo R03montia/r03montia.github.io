@@ -1,14 +1,26 @@
 [
   {
-    "name": "personal-website",
-    "description": "本站源码：Astro 静态博客，trauma 版式风格。",
+    "name": "r03montia.github.io",
+    "description": "本站源码：R03montia 的个人站点，Astro 静态博客。",
     "tech": ["Astro", "CSS", "TypeScript"],
-    "url": "https://github.com/R03montia/personal-website"
+    "url": "https://github.com/R03montia/r03montia.github.io"
   },
   {
-    "name": "示例项目占位",
-    "description": "第二个项目的占位描述，替换成真实项目即可。",
+    "name": "QuickMemo",
+    "description": "Win11 风格的快捷备忘录，支持定时提醒功能。",
+    "tech": ["HTML", "CSS", "JavaScript"],
+    "url": "https://github.com/R03montia/QuickMemo"
+  },
+  {
+    "name": "deepseek-usage-monitor",
+    "description": "适用于 DeepSeek API 的用量实时显示桌面小组件（fork 自第三方仓库）。",
     "tech": ["Python"],
-    "url": "https://github.com/R03montia"
+    "url": "https://github.com/R03montia/deepseek-usage-monitor"
+  },
+  {
+    "name": "note-ms-debounce-optimize-script",
+    "description": "Note.ms 油猴脚本：防抖保存与风味文本优化。",
+    "tech": ["JavaScript"],
+    "url": "https://github.com/R03montia/note-ms-debounce-optimize-script"
   }
 ]
