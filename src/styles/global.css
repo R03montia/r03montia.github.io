@@ -62,11 +62,12 @@ a:hover {
   background: rgb(var(--accent) / 0.25);
 }
 
-/* ===== 白色半透明内容卡片（trauma 核心）===== */
+/* ===== 毛玻璃半透明内容卡片（trauma 核心）===== */
 .card {
-  background: rgb(var(--content-bg) / 0.9);
+  background: rgb(var(--content-bg) / 0.35);
   box-shadow: 0 0 2.5rem -1rem rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
 }
 
 /* ===== 底部城市剪影（原版 trauma 实现方式：skyline.svg 平铺）=====
