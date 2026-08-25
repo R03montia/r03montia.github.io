@@ -69,9 +69,8 @@ a:hover {
   backdrop-filter: blur(4px);
 }
 
-/* ===== 三层城市剪影（原版 trauma 实现方式：skyline.svg 平铺）=====
-   与原版 #extra-div-1/2/3 一致：不同 background-size 产生近大远小，
-   不同透明度分层，bottom 锚定。 */
+/* ===== 底部城市剪影（原版 trauma 实现方式：skyline.svg 平铺）=====
+   单层，底部锚定，仅保留近景剪影。 */
 .silhouettes {
   position: fixed;
   inset: auto 0 0 0;
@@ -93,14 +92,6 @@ a:hover {
   background-size: 20rem;
   background-repeat: repeat-x;
   background-position: bottom center;
-}
-.sky-l3 {
-  height: 100vh;
-  opacity: var(--extra-opacity-3, 0.05);
-  background-image: url(/skyline.svg);
-  background-size: 80rem;
-  background-repeat: repeat-x;
-  background-position: bottom;
 }
 [data-theme='dark'] .silhouettes > div {
   filter: invert(1);
