@@ -70,8 +70,9 @@ a:hover {
   -webkit-backdrop-filter: blur(1rem);
 }
 
-/* ===== 底部城市剪影（原版 trauma 实现方式：skyline.svg 平铺）=====
-   单层，底部锚定，仅保留近景剪影。 */
+/* ===== 底部城市剪影（trauma 多层版：skyline.svg 平铺）=====
+   近 / 中 两层由近到远高度递增、tile 放大、透明度递减，营造纵深。
+   （曾试过再加一层 100vh 远景，但 svg 顶部有像素会在页面中部漏出多余剪影，故撤掉。） */
 .silhouettes {
   position: fixed;
   inset: auto 0 0 0;
@@ -85,14 +86,21 @@ a:hover {
   left: 0;
   width: 100%;
   pointer-events: none;
-}
-.sky-l1 {
-  height: 25vh;
-  opacity: var(--extra-opacity-1, 0.15);
   background-image: url(/skyline.svg);
-  background-size: 20rem;
   background-repeat: repeat-x;
   background-position: bottom center;
+}
+/* 近景：最矮、tile 最小、最清晰 */
+.sky-l1 {
+  height: 25vh;
+  opacity: var(--extra-opacity-1, 0.18);
+  background-size: 20rem;
+}
+/* 中景 */
+.sky-l2 {
+  height: 50vh;
+  opacity: var(--extra-opacity-2, 0.1);
+  background-size: 40rem;
 }
 [data-theme='dark'] .silhouettes > div {
   filter: invert(1);

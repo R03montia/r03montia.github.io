@@ -1,16 +1,12 @@
 ---
-// 原版 trauma 版式城市剪影：skyline.svg 以 CSS background 平铺，与原版 #extra-div-* 实现一致
+// 城市剪影容器：实际 background-image / size / position / opacity 都在 global.css
+// 的 .silhouettes > div / .sky-l1/.sky-l2/.sky-l3 上配，方便做多层覆盖。
 ---
 <div class="skyline" aria-hidden="true"></div>
 
 <style>
   .skyline {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url(/skyline.svg);
-    background-repeat: repeat-x;
+    inset: 0;
   }
 </style>
