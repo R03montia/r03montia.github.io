@@ -80,6 +80,13 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     </div>
     <div class="rain-overlay" aria-hidden="true" transition:persist></div>
     <script>
+      // 从表版切到里版时,视口位置可能保留在表版的滚动位置,导致 hero 没出现在首屏。
+      // 进入 /inside/* 任何页面都强制回到顶部。
+      if (window.scrollY > 0) window.scrollTo(0, 0);
+      document.addEventListener('astro:after-swap', () => {
+        if (window.scrollY > 0 && !location.hash) window.scrollTo(0, 0);
+      });
+
       // 站内搜索:与表版 BaseLayout 同一份 pagefind 客户端
       type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
       type Pagefind = { search: (q: string) => Promise<{ results: PagefindResult[] }> };
@@ -292,11 +299,16 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         justify-content: center;
         text-align: center;
         overflow: hidden;
+        /* 底色先兜一层实色,防止图片/渐变未加载时透出页面底 */
+        background-color: rgb(var(--body-bg));
         /* 预留:--hero-bg-img 由组件 props 传入;空时只有渐变,有值时渐变叠在图上 */
-        background:
+        background-image:
           linear-gradient(to bottom, rgb(var(--body-bg) / 0.55), rgb(var(--body-bg) / 0.85)),
-          var(--hero-bg-img, none) center / cover no-repeat,
+          var(--hero-bg-img, none),
           radial-gradient(ellipse 80% 50% at 50% 30%, rgb(60 70 110 / 0.45), transparent 70%);
+        background-size: cover, cover, cover;
+        background-position: center, center, center;
+        background-repeat: no-repeat;
       }
       .night-hero-inner {
         position: relative;

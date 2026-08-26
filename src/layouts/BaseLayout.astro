@@ -186,15 +186,12 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         });
       };
       // 里版·夜 触发:页面滚到底后继续下拉滚轮 3 次,坠入夜晚。
-      // 每次下拽整页轻微下沉 + 变暗作张力提示;触发后给 <html> 加 data-night
-      // 让落场动画跑起来,然后 Astro 导航到 /inside/(由 NightLayout 接管皮肤)。
+      // 每次下拽整页轻微下沉 + 变暗作张力提示;触发后只播 body 级的
+      // "night-fall" 动画(不加 data-night — 否则表版会闪出旧里版皮肤),
+      // 动画中段跳转到 /inside/,由 NightLayout 自己的 SSR data-night 接管夜色。
       const enterNight = () => {
-        const root = document.documentElement;
-        if (root.hasAttribute('data-night')) return;
-        root.setAttribute('data-night', '');
         document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
         document.body.classList.add('night-enter');
-        // 等动画跑完一半再跳,让用户看到"坠入"的势头
         setTimeout(() => {
           window.location.href = '/inside/';
         }, 350);

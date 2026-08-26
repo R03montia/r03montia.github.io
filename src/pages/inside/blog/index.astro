@@ -8,7 +8,7 @@ const posts = sortPosts(await getCollection('blog', (p) => p.data.night));
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 ---
 <NightLayout title="夜里 · 下反熔毁集群" description="里版全部文章。">
-  <h1 class="page-title">夜里</h1>
+  <h1 class="page-title">最近更新</h1>
   {allTags.length > 0 && (
     <div class="tag-row">
       {allTags.map((t) => <a class="tag-pill" href={`/inside/tag/${t}/`}>#{t}</a>)}
