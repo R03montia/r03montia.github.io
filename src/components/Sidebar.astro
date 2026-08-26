@@ -2,7 +2,7 @@
 const items = [
   { href: '/', label: '首页', icon: 'home' },
   { href: '/blog/', label: '博客', icon: 'pen' },
-  { href: '/projects/', label: '项目', icon: 'code' },
+  { href: '/projects/', label: '项目', icon: 'code', dayOnly: true },
   { href: '/about/', label: '关于', icon: 'user' },
 ];
 const icons: Record<string, string> = {
@@ -25,7 +25,7 @@ const isActive = (href: string) =>
   </a>
   <nav aria-label="主导航">
     {items.map((it) => (
-      <a class:list={['side-link', { active: isActive(it.href) }]} href={it.href} data-nav-link aria-current={isActive(it.href) ? 'page' : undefined}>
+      <a class:list={['side-link', { active: isActive(it.href), 'day-only': it.dayOnly }]} href={it.href} data-nav-link aria-current={isActive(it.href) ? 'page' : undefined}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[it.icon]} />
         <span>{it.label}</span>
       </a>
@@ -49,13 +49,13 @@ const isActive = (href: string) =>
       </button>
       <button id="rain-toggle" type="button" aria-label="切换下雨效果" title="切换下雨效果">
         <svg class="icon-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 16.25"/>
-          <path d="M8 18v3M12 17v4M16 18v3"/>
+          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+          <path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>
         </svg>
         <svg class="icon-rain-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 16.25"/>
-          <path d="M8 18v3M12 17v4M16 18v3"/>
-          <line x1="3" y1="3" x2="21" y2="21" stroke-width="2.5"/>
+          <path d="M2 2l20 20"/>
+          <path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193"/>
+          <path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/>
         </svg>
       </button>
     </div>
@@ -136,7 +136,7 @@ const isActive = (href: string) =>
     align-items: center;
     justify-content: center;
   }
-  #rain-toggle svg { width: 1rem; height: 1rem; }
+  #rain-toggle svg { width: 1rem; height: 1rem; display: block; }
   #rain-toggle .icon-rain-off { display: none; }
   :global(html:not([data-rainy])) #rain-toggle .icon-rain { display: none; }
   :global(html:not([data-rainy])) #rain-toggle .icon-rain-off { display: block; }

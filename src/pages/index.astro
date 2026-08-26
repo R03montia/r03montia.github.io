@@ -8,11 +8,18 @@ const recent = sortPosts(await getCollection('blog')).slice(0, 5);
 ---
 <BaseLayout title="R03montia" description="R03montia 的个人站点：博客、项目与关于。">
   <section class="hero card">
-    <h1>R03montia</h1>
-    <p>去做各种各样的梦吧。</p>
+    <div class="hero-day">
+      <h1>R03montia</h1>
+      <p>去做各种各样的梦吧。</p>
+    </div>
+    <div class="hero-night">
+      <h1>下反熔毁集群</h1>
+      <p>虽然我认为自己已从梦中苏醒，<br/>但我仍处于噩梦的正中心。</p>
+    </div>
   </section>
   <section class="recent">
-    <h2>最近更新</h2>
+    <h2 class="hero-day">最近更新</h2>
+    <h2 class="hero-night">夜里的更新</h2>
     <div class="list">
       {recent.map((p) => <PostCard post={p} />)}
     </div>
@@ -23,8 +30,19 @@ const recent = sortPosts(await getCollection('blog')).slice(0, 5);
 <style>
   .hero { border-radius: 12px; padding: 2.5rem 2rem; margin-bottom: 2.5rem; }
   .hero h1 { margin: 0; font-family: var(--font-deco); font-weight: 400; font-size: clamp(2.2rem, 6vw, 3.5rem); letter-spacing: 0.02em; }
-  .hero p { margin: 0.5rem 0 0; color: rgb(var(--text-secondary)); }
+  .hero p { margin: 0.5rem 0 0; color: rgb(var(--text-secondary)); line-height: 1.7; }
   .recent h2 { font-family: var(--font-ui); font-size: 1.1rem; }
   .list { display: grid; gap: 0.9rem; }
   .more { display: inline-block; margin-top: 1rem; font-family: var(--font-ui); font-size: 0.9rem; }
+
+  /* 表版/里版文案切换:默认显示 day,只在 html[data-night] 下翻转到 night */
+  .hero-night { display: none; }
+  :global(html[data-night]) .hero-day { display: none; }
+  :global(html[data-night]) .hero-night { display: block; }
+  :global(html[data-night]) .hero-night h1 {
+    background: linear-gradient(135deg, rgb(180 200 255), rgb(120 140 255));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 </style>

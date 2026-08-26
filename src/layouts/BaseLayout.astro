@@ -56,6 +56,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         const savedRain = localStorage.getItem('rain');
         const rainy = savedRain ? savedRain === 'on' : true;
         document.documentElement.toggleAttribute('data-rainy', rainy);
+        // 里版·夜:跨页保持
+        if (localStorage.getItem('night') === 'on') {
+          document.documentElement.setAttribute('data-night', '');
+        }
       })();
     </script>
   </head>
@@ -84,6 +88,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 19V5" /><path d="M5 12l7-7 7 7" />
       </svg>
+    </button>
+    <button id="night-exit" type="button" aria-label="返回地表">
+      <span class="night-exit-arrow" aria-hidden="true">↑</span>
+      <span class="night-exit-text">返回地表</span>
     </button>
     <script>
       const toggleTheme = () => {
@@ -123,6 +131,9 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         }
         if (cur.hasAttribute('data-rainy')) {
           next.setAttribute('data-rainy', '');
+        }
+        if (cur.hasAttribute('data-night')) {
+          next.setAttribute('data-night', '');
         }
       };
       // 持久化导航的 active 高亮：transition:persist 让侧栏/底栏不重渲染，
@@ -184,6 +195,56 @@ const ogImageUrl = new URL(ogImage, Astro.site);
             a.appendChild(icon);
           }
         });
+      };
+      // 里版·夜 触发:页面滚到底后继续下拉滚轮 3 次,坠入夜晚。
+      // 每次下拽整页轻微下沉 + 变暗作张力提示,触发后落场动画进入。
+      const enterNight = () => {
+        const root = document.documentElement;
+        if (root.hasAttribute('data-night')) return;
+        root.setAttribute('data-night', '');
+        localStorage.setItem('night', 'on');
+        document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
+        document.body.classList.add('night-enter');
+        document.body.addEventListener('animationend', () => {
+          document.body.classList.remove('night-enter');
+        }, { once: true });
+      };
+      const exitNight = () => {
+        document.documentElement.removeAttribute('data-night');
+        localStorage.setItem('night', 'off');
+        document.body.classList.add('day-enter');
+        document.body.addEventListener('animationend', () => {
+          document.body.classList.remove('day-enter');
+        }, { once: true });
+      };
+      const NIGHT_PULLS_NEEDED = 3;
+      const NIGHT_PULL_WINDOW_MS = 1500;
+      let nightPullCount = 0;
+      let nightPullTimer: ReturnType<typeof setTimeout> | null = null;
+      let nightLockUntil = 0;
+      const resetNightPull = () => {
+        nightPullCount = 0;
+        document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
+      };
+      const onNightWheel = (e: WheelEvent) => {
+        if (e.deltaY <= 0) return;
+        if (document.documentElement.hasAttribute('data-night')) return;
+        if (Date.now() < nightLockUntil) return;
+        const doc = document.documentElement;
+        const atBottom = doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 4;
+        if (!atBottom) { resetNightPull(); return; }
+        nightPullCount += 1;
+        document.body.classList.add('night-hint');
+        document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
+        document.body.classList.add(`night-hint-${Math.min(nightPullCount, 3)}`);
+        if (nightPullTimer) clearTimeout(nightPullTimer);
+        if (nightPullCount >= NIGHT_PULLS_NEEDED) {
+          nightLockUntil = Date.now() + 1000;
+          resetNightPull();
+          enterNight();
+          return;
+        }
+        nightPullTimer = setTimeout(resetNightPull, NIGHT_PULL_WINDOW_MS);
       };
       // 返回顶部按钮：滚动超一屏淡入。
       const syncBackToTop = () => {
@@ -269,11 +330,13 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           else if (hit('#theme-toggle')) toggleTheme();
           else if (hit('#rain-toggle')) toggleRain();
           else if (hit('#back-to-top')) window.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (hit('#night-exit')) exitNight();
         });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') setMenu(false);
         });
         window.addEventListener('scroll', syncBackToTop, { passive: true });
+        window.addEventListener('wheel', onNightWheel, { passive: true });
         document.addEventListener('astro:before-swap', persistThemeRain);
         document.addEventListener('astro:after-swap', () => {
           setMenu(false);
