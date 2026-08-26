@@ -10,8 +10,17 @@ import { ClientRouter } from 'astro:transitions';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
 }
-const { title, description = 'R03montia 的个人站点。' } = Astro.props;
+const {
+  title,
+  description = 'R03montia 的个人站点。',
+  ogImage = '/og.jpg',
+  ogType = 'website',
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -19,7 +28,23 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="R03montia" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="theme-color" content="#cdd4dc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#12151a" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title="R03montia" href="/rss.xml" />
     <title>{title}</title>
     <ClientRouter />
@@ -27,7 +52,6 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
       (() => {
         const saved = localStorage.getItem('theme');
         const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.toggleAttribute('data-theme', dark);
         if (dark) document.documentElement.setAttribute('data-theme', 'dark');
         const savedRain = localStorage.getItem('rain');
         const rainy = savedRain ? savedRain === 'on' : true;
@@ -111,6 +135,14 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
           else a.removeAttribute('aria-current');
         });
       };
+      // 博客正文图片懒加载：构建时 markdown 渲染不带 loading 属性，
+      // 在客户端一次性补上，避免长文首屏刷流量。
+      const lazyProseImages = () => {
+        document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+          if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+          if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+        });
+      };
       // 移动端汉堡抽屉 + 明暗/雨开关：全部用 document 事件委托，并通过 window
       // 一次性标记保证只在首帧绑定一次。Astro 切页时模块脚本会重跑：直接给
       // 元素绑监听会让持久化元素（侧栏开关按钮）叠加监听；而新页面按钮在
@@ -141,9 +173,11 @@ const { title, description = 'R03montia 的个人站点。' } = Astro.props;
         document.addEventListener('astro:after-swap', () => {
           setMenu(false);
           updateNavActive();
+          lazyProseImages();
         });
       }
       updateNavActive();
+      lazyProseImages();
     </script>
     <style is:global>
       /* 页面切换：模糊淡入淡出 */

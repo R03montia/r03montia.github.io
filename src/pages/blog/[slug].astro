@@ -13,7 +13,7 @@ const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
-<BaseLayout title={`${post.data.title} | R03montia`} description={post.data.description}>
+<BaseLayout title={`${post.data.title} | R03montia`} description={post.data.description} ogType="article">
   <article class="post-card card post">
     <header>
       <h1>{post.data.title}</h1>
