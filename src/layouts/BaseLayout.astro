@@ -80,6 +80,11 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       <a class="mobile-brand" href="/">R03montia</a>
     </header>
     <div id="drawer-backdrop"></div>
+    <button id="back-to-top" type="button" aria-label="回到顶部" title="回到顶部">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5" /><path d="M5 12l7-7 7 7" />
+      </svg>
+    </button>
     <script>
       const toggleTheme = () => {
         const root = document.documentElement;
@@ -90,9 +95,8 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       };
       const syncRain = () => {
         const on = document.documentElement.hasAttribute('data-rainy');
-        document.querySelectorAll('.rain-label').forEach((el) => {
-          el.textContent = on ? '开' : '关';
-        });
+        const btn = document.getElementById('rain-toggle');
+        if (btn) btn.setAttribute('aria-label', on ? '关闭下雨效果' : '开启下雨效果');
       };
       const toggleRain = () => {
         const root = document.documentElement;
@@ -107,8 +111,8 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       // 之外的全部属性，再用新文档的属性覆盖。新文档是构建时静态产物，
       // data-theme / data-rainy 是 head 脚本运行时才设的，没法在 HTML 里。
       // 解决：在 swap 前把当前 <html> 上的这两个属性复制到 newDocument 的根上，
-      // swap 会把它们一起沿用过来。同步 syncRain 是因为侧栏上持久化的
-      // 「开/关」文字标签也是构建时的旧值，需要按当前实际状态刷新。
+      // swap 会把它们一起沿用过来。同步 syncRain 是为了让按钮 aria-label
+      // 跟当前实际状态一致（图标显隐由 CSS :not([data-rainy]) 处理）。
       const persistThemeRain = (event: Event) => {
         const newDoc = (event as CustomEvent & { newDocument?: Document }).newDocument;
         if (!newDoc) return;
@@ -143,6 +147,105 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
         });
       };
+      // 代码块右上角复制按钮：构建产物里没有，客户端插入。
+      const enhanceCodeBlocks = () => {
+        document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+          if (pre.querySelector('.copy-btn')) return;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'copy-btn';
+          btn.textContent = '复制';
+          btn.setAttribute('aria-label', '复制代码');
+          btn.addEventListener('click', async () => {
+            const text = pre.innerText.replace(/\n?复制$/, '');
+            try {
+              await navigator.clipboard.writeText(text);
+              btn.textContent = '已复制';
+              setTimeout(() => { btn.textContent = '复制'; }, 1200);
+            } catch {
+              btn.textContent = '失败';
+              setTimeout(() => { btn.textContent = '复制'; }, 1200);
+            }
+          });
+          pre.appendChild(btn);
+        });
+      };
+      // 外链新窗口 + ↗ 角标：只对 .prose 内的正文链接做，导航/按钮不动。
+      const markExternalLinks = () => {
+        document.querySelectorAll<HTMLAnchorElement>('.prose a[href^="http"]').forEach((a) => {
+          if (a.hostname === location.hostname) return;
+          a.setAttribute('target', '_blank');
+          a.setAttribute('rel', 'noopener noreferrer');
+          if (!a.querySelector('.ext-icon')) {
+            const icon = document.createElement('span');
+            icon.className = 'ext-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = '↗';
+            a.appendChild(icon);
+          }
+        });
+      };
+      // 返回顶部按钮：滚动超一屏淡入。
+      const syncBackToTop = () => {
+        const btn = document.getElementById('back-to-top');
+        if (!btn) return;
+        btn.classList.toggle('visible', window.scrollY > window.innerHeight);
+      };
+      // 站内搜索：pagefind 在 build 后产生 /pagefind/ 索引,运行时按需 import。
+      // 开发模式没构建索引,降级为隐藏空态提示。
+      type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
+      type Pagefind = { search: (q: string) => Promise<{ results: PagefindResult[] }> };
+      let pagefindPromise: Promise<Pagefind> | null = null;
+      const loadPagefind = (): Promise<Pagefind> => {
+        if (!pagefindPromise) {
+          // 构建期 /pagefind/ 还没生成,Rollup 无法静态解析,用 Function 延迟到运行时
+          const dynamicImport = new Function('u', 'return import(u)') as (u: string) => Promise<unknown>;
+          pagefindPromise = dynamicImport('/pagefind/pagefind.js') as Promise<Pagefind>;
+        }
+        return pagefindPromise;
+      };
+      const initSearch = () => {
+        const input = document.getElementById('site-search') as HTMLInputElement | null;
+        const panel = document.getElementById('search-results') as HTMLElement | null;
+        if (!input || !panel) return;
+        if ((input as HTMLInputElement & { __bound?: boolean }).__bound) return;
+        (input as HTMLInputElement & { __bound?: boolean }).__bound = true;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const close = () => { panel.classList.remove('open'); panel.innerHTML = ''; };
+        input.addEventListener('input', () => {
+          clearTimeout(timer);
+          const q = input.value.trim();
+          if (!q) { close(); return; }
+          timer = setTimeout(async () => {
+            try {
+              const pf = await loadPagefind();
+              const res = await pf.search(q);
+              const items = await Promise.all(res.results.slice(0, 8).map((r) => r.data()));
+              if (items.length === 0) {
+                panel.innerHTML = '<div class="sr-empty">没有匹配的结果</div>';
+              } else {
+                panel.innerHTML = items
+                  .map((d) => `<a href="${d.url}"><div class="sr-title">${d.meta?.title ?? d.url}</div><div class="sr-excerpt">${d.excerpt}</div></a>`)
+                  .join('');
+              }
+              panel.classList.add('open');
+            } catch {
+              panel.innerHTML = '<div class="sr-empty">搜索索引未生成（需 npm run build)</div>';
+              panel.classList.add('open');
+            }
+          }, 200);
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { input.value = ''; close(); input.blur(); }
+        });
+        document.addEventListener('click', (e) => {
+          if (!(e.target as Element | null)?.closest('.side-search')) close();
+        });
+        panel.addEventListener('click', (e) => {
+          const a = (e.target as Element | null)?.closest('a');
+          if (a) { input.value = ''; close(); }
+        });
+      };
       // 移动端汉堡抽屉 + 明暗/雨开关：全部用 document 事件委托，并通过 window
       // 一次性标记保证只在首帧绑定一次。Astro 切页时模块脚本会重跑：直接给
       // 元素绑监听会让持久化元素（侧栏开关按钮）叠加监听；而新页面按钮在
@@ -165,19 +268,29 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           else if (hit('[data-nav-link]')) setMenu(false);
           else if (hit('#theme-toggle')) toggleTheme();
           else if (hit('#rain-toggle')) toggleRain();
+          else if (hit('#back-to-top')) window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') setMenu(false);
         });
+        window.addEventListener('scroll', syncBackToTop, { passive: true });
         document.addEventListener('astro:before-swap', persistThemeRain);
         document.addEventListener('astro:after-swap', () => {
           setMenu(false);
           updateNavActive();
           lazyProseImages();
+          enhanceCodeBlocks();
+          markExternalLinks();
+          syncBackToTop();
+          initSearch();
         });
       }
       updateNavActive();
       lazyProseImages();
+      enhanceCodeBlocks();
+      markExternalLinks();
+      syncBackToTop();
+      initSearch();
     </script>
     <style is:global>
       /* 页面切换：模糊淡入淡出 */
@@ -309,6 +422,65 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       @media (max-width: 48rem) and (prefers-reduced-motion: reduce) {
         #main-sidebar, #drawer-backdrop { transition: none; }
         .hamb span { transition: none; }
+      }
+
+      /* 返回顶部按钮 */
+      #back-to-top {
+        position: fixed;
+        right: 1.25rem;
+        bottom: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        border: 1px solid rgb(var(--line) / 0.5);
+        background: rgb(var(--content-bg) / 0.5);
+        backdrop-filter: blur(1rem);
+        -webkit-backdrop-filter: blur(1rem);
+        color: rgb(var(--text));
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(0.5rem);
+        transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s;
+        z-index: 30;
+      }
+      #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+      #back-to-top:hover { background: rgb(var(--content-bg) / 0.8); }
+      #back-to-top svg { width: 1.1rem; height: 1.1rem; }
+      @media (max-width: 48rem) {
+        #back-to-top { right: 1rem; bottom: 1.25rem; width: 2.4rem; height: 2.4rem; }
+      }
+
+      /* 代码块复制按钮 */
+      .prose pre { position: relative; }
+      .prose pre .copy-btn {
+        position: absolute;
+        top: 0.4rem;
+        right: 0.4rem;
+        font-family: var(--font-ui);
+        font-size: 0.7rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 5px;
+        border: 1px solid rgb(var(--content-bg) / 0.3);
+        background: rgb(var(--content-bg) / 0.15);
+        color: rgb(var(--content-bg) / 0.8);
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s ease-out, background 0.15s ease-out;
+      }
+      .prose pre:hover .copy-btn,
+      .prose pre .copy-btn:focus-visible { opacity: 1; }
+      .prose pre .copy-btn:hover { background: rgb(var(--content-bg) / 0.3); color: rgb(var(--content-bg)); }
+
+      /* 外链角标 */
+      .prose a .ext-icon {
+        font-size: 0.78em;
+        margin-left: 0.15em;
+        vertical-align: super;
+        color: rgb(var(--accent) / 0.8);
       }
     </style>
   </body>

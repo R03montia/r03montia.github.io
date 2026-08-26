@@ -1,19 +1,27 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { readingTime } from '../../utils/posts';
+import { readingTime, sortPosts } from '../../utils/posts';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = sortPosts(await getCollection('blog'));
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prev: i > 0 ? posts[i - 1] : null,          // 较新一篇
+      next: i < posts.length - 1 ? posts[i + 1] : null, // 较旧一篇
+    },
+  }));
 }
 
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 <BaseLayout title={`${post.data.title} | R03montia`} description={post.data.description} ogType="article">
+  <div class="progress-bar" aria-hidden="true"><span class="progress-fill"></span></div>
   <article class="post-card card post">
     <header>
       <h1>{post.data.title}</h1>
@@ -28,7 +36,7 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
         <div class="toc-title">目录</div>
         <ul>
           {toc.map((h) => (
-            <li class:list={[`d${h.depth}`]}><a href={`#${h.slug}`}>{h.text}</a></li>
+            <li class:list={[`d${h.depth}`]}><a href={`#${h.slug}`} data-toc-link={h.slug}>{h.text}</a></li>
           ))}
         </ul>
       </aside>
@@ -36,8 +44,57 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
     <div class="prose">
       <Content />
     </div>
+    {(prev || next) && (
+      <nav class="post-nav" aria-label="文章导航">
+        {prev ? (
+          <a class="post-nav-link prev" href={`/blog/${prev.id}/`}>
+            <span class="post-nav-dir">← 上一篇</span>
+            <span class="post-nav-title">{prev.data.title}</span>
+          </a>
+        ) : <span />}
+        {next ? (
+          <a class="post-nav-link next" href={`/blog/${next.id}/`}>
+            <span class="post-nav-dir">下一篇 →</span>
+            <span class="post-nav-title">{next.data.title}</span>
+          </a>
+        ) : <span />}
+      </nav>
+    )}
   </article>
 </BaseLayout>
+
+<script>
+  // 阅读进度 + TOC 滚动监听。Astro 切页时模块脚本会重跑,需要在 cleanup 时
+  // 移除监听,否则会叠加。
+  const fill = document.querySelector<HTMLElement>('.progress-fill');
+  const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+  const headingsEls = tocLinks
+    .map((a) => document.getElementById(a.dataset.tocLink || ''))
+    .filter((el): el is HTMLElement => !!el);
+
+  const onScroll = () => {
+    if (fill) {
+      const doc = document.documentElement;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? Math.min(1, doc.scrollTop / total) : 0;
+      fill.style.transform = `scaleX(${pct})`;
+    }
+    if (headingsEls.length > 0) {
+      const fromTop = window.scrollY + 96; // 给 header 留一点提前量
+      let activeIdx = -1;
+      for (let i = 0; i < headingsEls.length; i++) {
+        if (headingsEls[i].offsetTop <= fromTop) activeIdx = i;
+        else break;
+      }
+      tocLinks.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  document.addEventListener('astro:before-swap', () => {
+    window.removeEventListener('scroll', onScroll);
+  }, { once: true });
+</script>
 
 <style>
   .post { border-radius: 12px; padding: 2rem clamp(1.2rem, 4vw, 2.5rem); margin-bottom: 4rem; }
@@ -47,7 +104,8 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
   .toc-title { font-family: var(--font-ui); margin-bottom: 0.4rem; color: rgb(var(--text-secondary)); }
   .toc ul { list-style: none; margin: 0; padding: 0; }
   .toc li.d3 { padding-left: 0.9rem; }
-  .toc a { color: rgb(var(--text-secondary)); }
+  .toc a { color: rgb(var(--text-secondary)); display: block; padding: 0.1rem 0; border-left: 2px solid transparent; padding-left: 0.5rem; margin-left: -0.5rem; }
+  .toc a.active { color: rgb(var(--accent)); border-left-color: rgb(var(--accent)); }
   .prose :global(h2) { font-family: var(--font-ui); border-bottom: 1px solid rgb(var(--line) / 0.4); padding-bottom: 0.3rem; scroll-margin-top: 2rem; }
   .prose :global(h3) { font-family: var(--font-ui); scroll-margin-top: 2rem; }
   .prose :global(blockquote) { margin: 1rem 0; padding: 0.2rem 1rem; border-left: 0.3rem solid rgb(var(--accent) / 0.7); background: rgb(var(--content-bg) / 0.6); }
@@ -57,4 +115,56 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
   .prose :global(img) { max-width: 100%; filter: grayscale(1); transition: filter 0.3s ease; }
   .prose :global(img:hover) { filter: grayscale(0); }
   @media (max-width: 88rem) { .toc { display: none; } }
+
+  /* 阅读进度条:固定视口顶,移动端在 mobile-topbar 下 */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 50;
+    background: transparent;
+    pointer-events: none;
+  }
+  .progress-fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: rgb(var(--accent));
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    transition: transform 0.06s linear;
+  }
+  @media (max-width: 48rem) {
+    .progress-bar { top: 3.2rem; }
+  }
+
+  /* 上一篇 / 下一篇 */
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(var(--line) / 0.4);
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    color: rgb(var(--text));
+    border: 1px solid rgb(var(--line) / 0.4);
+    background: rgb(var(--content-bg) / 0.25);
+  }
+  .post-nav-link:hover { text-decoration: none; background: rgb(var(--content-bg) / 0.6); }
+  .post-nav-link.next { text-align: right; align-items: flex-end; }
+  .post-nav-dir { font-size: 0.72rem; color: rgb(var(--text-secondary)); font-family: var(--font-ui); }
+  .post-nav-title { font-size: 0.86rem; font-family: var(--font-ui); }
+  @media (max-width: 48rem) {
+    .post-nav { grid-template-columns: 1fr; }
+    .post-nav-link.next { text-align: left; align-items: flex-start; }
+  }
 </style>
