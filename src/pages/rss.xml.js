@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import { sortPosts } from '../utils/posts';
 
 export async function GET(context) {
-  const posts = sortPosts(await getCollection('blog'));
+  const posts = sortPosts(await getCollection('blog', (p) => !p.data.night));
   return rss({
     title: 'R03montia',
     description: 'R03montia 的个人站点。',

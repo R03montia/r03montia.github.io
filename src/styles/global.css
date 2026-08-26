@@ -33,8 +33,7 @@
   --body-bg: 18 21 26;
 }
 
-/* ===== 里版 · Another Night =====
-   冷黑底 + 蓝调链接,完全独立于明/暗主题。 */
+/* ===== 里版 · Another Night(由 NightLayout 在 <html data-night> 下激活) ===== */
 [data-night] {
   --body-bg: 16 15 20;
   --content-bg: 24 23 32;
@@ -117,7 +116,7 @@ a:hover {
   filter: invert(1);
 }
 
-/* 里版夜空渐变覆盖:从顶部深空到底部纯黑,剪影 invert 让其变亮(夜景) */
+/* 里版夜空渐变覆盖:从顶部深空到底部纯黑,剪影 invert 让其变亮(夜景),雨丝反白 */
 [data-night] body {
   background:
     radial-gradient(ellipse 80% 50% at 50% -10%, rgb(60 70 110 / 0.35), transparent 60%),
@@ -127,31 +126,18 @@ a:hover {
 [data-night] .silhouettes > div {
   filter: invert(1) brightness(0.85);
 }
-
-/* 里版:隐藏明暗切换,雨丝强制反色为白(等同表版暗色雨) */
-[data-night] #theme-toggle { display: none !important; }
 [data-night] .rain-overlay { filter: invert(1); }
-/* 里版隐藏"项目"入口(用 !important 压过 Astro 的 scoped cid 规则,避免切页时闪烁) */
-[data-night] .side-link.day-only { display: none !important; }
 
-/* 落场动画:整页从上方坠入夜色(只在进入里版那一瞬) */
+/* 落场动画:整页从上方坠入夜色(只在进入里版那一瞬,进入后由 /inside/ 接管) */
 @keyframes night-fall {
   from { transform: translateY(-3rem); opacity: 0; filter: blur(6px); }
   to   { transform: translateY(0);     opacity: 1; filter: blur(0); }
 }
 body.night-enter {
-  animation: night-fall 0.7s ease-out;
-}
-/* 回表版:整页从下方升起 + 变亮,与 night-fall 镜像 */
-@keyframes day-rise {
-  from { transform: translateY(3rem); opacity: 0; filter: blur(6px) brightness(0.6); }
-  to   { transform: translateY(0);    opacity: 1; filter: blur(0) brightness(1); }
-}
-body.day-enter {
-  animation: day-rise 0.7s ease-out;
+  animation: night-fall 0.5s ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  body.night-enter, body.day-enter { animation: none; }
+  body.night-enter { animation: none; }
 }
 
 /* 底部触发时的张力提示:整页轻微下拽 + 渐暗 */
@@ -161,45 +147,6 @@ body.night-hint {
 body.night-hint-1 { transform: translateY(0.4rem); filter: brightness(0.95); }
 body.night-hint-2 { transform: translateY(0.9rem); filter: brightness(0.85); }
 body.night-hint-3 { transform: translateY(1.6rem); filter: brightness(0.7); }
-
-/* 退出里版按钮:右上角,↑ 在上,下方竖排"返回地表" */
-#night-exit {
-  position: fixed;
-  top: 1.25rem;
-  right: 1.25rem;
-  padding: 0.6rem 0.55rem;
-  border-radius: 8px;
-  border: 1px solid rgb(var(--line) / 0.4);
-  background: rgb(var(--content-bg) / 0.35);
-  backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
-  color: rgb(var(--text));
-  cursor: pointer;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-  z-index: 30;
-  font-family: var(--font-ui);
-  transition: background 0.15s ease-out, transform 0.15s ease-out;
-}
-[data-night] #night-exit { display: flex; }
-#night-exit:hover { background: rgb(var(--content-bg) / 0.6); transform: translateY(-2px); }
-#night-exit .night-exit-arrow {
-  font-size: 1.05rem;
-  line-height: 1;
-  color: rgb(var(--text));
-}
-#night-exit .night-exit-text {
-  writing-mode: vertical-rl;
-  letter-spacing: 0.2em;
-  font-size: 0.78rem;
-  line-height: 1;
-}
-@media (max-width: 48rem) {
-  #night-exit { top: 3.6rem; right: 0.85rem; padding: 0.5rem 0.4rem; }
-  #night-exit .night-exit-text { letter-spacing: 0.15em; }
-}
 
 
 /* ===== rainy 雨幕层 =====

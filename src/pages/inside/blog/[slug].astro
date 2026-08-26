@@ -1,16 +1,16 @@
 ---
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { readingTime, sortPosts } from '../../utils/posts';
+import NightLayout from '../../../layouts/NightLayout.astro';
+import { readingTime, sortPosts } from '../../../utils/posts';
 
 export async function getStaticPaths() {
-  const posts = sortPosts(await getCollection('blog', (p) => !p.data.night));
+  const posts = sortPosts(await getCollection('blog', (p) => p.data.night));
   return posts.map((post, i) => ({
     params: { slug: post.id },
     props: {
       post,
-      prev: i > 0 ? posts[i - 1] : null,          // 较新一篇
-      next: i < posts.length - 1 ? posts[i + 1] : null, // 较旧一篇
+      prev: i > 0 ? posts[i - 1] : null,
+      next: i < posts.length - 1 ? posts[i + 1] : null,
     },
   }));
 }
@@ -20,7 +20,7 @@ const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
-<BaseLayout title={`${post.data.title} | R03montia`} description={post.data.description} ogType="article">
+<NightLayout title={`${post.data.title} | 下反熔毁集群`} description={post.data.description}>
   <div class="progress-bar" aria-hidden="true"><span class="progress-fill"></span></div>
   <article class="post-card card post">
     <header>
@@ -28,7 +28,7 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
       <div class="meta">
         <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
         <span>约 {readingTime(post.body ?? '')} 分钟</span>
-        {post.data.tags.map((t) => <a href={`/tag/${t}/`}>#{t}</a>)}
+        {post.data.tags.map((t) => <a href={`/inside/tag/${t}/`}>#{t}</a>)}
       </div>
     </header>
     {toc.length > 1 && (
@@ -47,13 +47,13 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
     {(prev || next) && (
       <nav class="post-nav" aria-label="文章导航">
         {prev ? (
-          <a class="post-nav-link prev" href={`/blog/${prev.id}/`}>
+          <a class="post-nav-link prev" href={`/inside/blog/${prev.id}/`}>
             <span class="post-nav-dir">← 上一篇</span>
             <span class="post-nav-title">{prev.data.title}</span>
           </a>
         ) : <span />}
         {next ? (
-          <a class="post-nav-link next" href={`/blog/${next.id}/`}>
+          <a class="post-nav-link next" href={`/inside/blog/${next.id}/`}>
             <span class="post-nav-dir">下一篇 →</span>
             <span class="post-nav-title">{next.data.title}</span>
           </a>
@@ -61,11 +61,9 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
       </nav>
     )}
   </article>
-</BaseLayout>
+</NightLayout>
 
 <script>
-  // 阅读进度 + TOC 滚动监听。Astro 切页时模块脚本会重跑,需要在 cleanup 时
-  // 移除监听,否则会叠加。
   const fill = document.querySelector<HTMLElement>('.progress-fill');
   const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
   const headingsEls = tocLinks
@@ -80,7 +78,7 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
       fill.style.transform = `scaleX(${pct})`;
     }
     if (headingsEls.length > 0) {
-      const fromTop = window.scrollY + 96; // 给 header 留一点提前量
+      const fromTop = window.scrollY + 96;
       let activeIdx = -1;
       for (let i = 0; i < headingsEls.length; i++) {
         if (headingsEls[i].offsetTop <= fromTop) activeIdx = i;
@@ -116,10 +114,9 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
   .prose :global(img:hover) { filter: grayscale(0); }
   @media (max-width: 88rem) { .toc { display: none; } }
 
-  /* 阅读进度条:固定视口顶,移动端在 mobile-topbar 下 */
   .progress-bar {
     position: fixed;
-    top: 0;
+    top: 3rem;
     left: 0;
     right: 0;
     height: 3px;
@@ -136,11 +133,7 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
     transform: scaleX(0);
     transition: transform 0.06s linear;
   }
-  @media (max-width: 48rem) {
-    .progress-bar { top: 3.2rem; }
-  }
 
-  /* 上一篇 / 下一篇 */
   .post-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;

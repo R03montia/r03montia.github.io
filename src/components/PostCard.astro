@@ -4,12 +4,15 @@ import { readingTime } from '../utils/posts';
 
 interface Props {
   post: CollectionEntry<'blog'>;
+  night?: boolean;
 }
-const { post } = Astro.props;
+const { post, night = false } = Astro.props;
 const { title, date, tags, description } = post.data;
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+const postUrl = night ? `/inside/blog/${post.id}/` : `/blog/${post.id}/`;
+const tagUrl = (t: string) => (night ? `/inside/tag/${t}/` : `/tag/${t}/`);
 ---
-<a class="post-card card" href={`/blog/${post.id}/`}>
+<a class="post-card card" href={postUrl}>
   <div class="pc-head">
     <h3>{title}</h3>
     <time datetime={date.toISOString()}>{fmt.format(date)}</time>

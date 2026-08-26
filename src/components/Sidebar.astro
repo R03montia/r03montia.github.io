@@ -2,7 +2,7 @@
 const items = [
   { href: '/', label: '首页', icon: 'home' },
   { href: '/blog/', label: '博客', icon: 'pen' },
-  { href: '/projects/', label: '项目', icon: 'code', dayOnly: true },
+  { href: '/projects/', label: '项目', icon: 'code' },
   { href: '/about/', label: '关于', icon: 'user' },
 ];
 const icons: Record<string, string> = {
@@ -25,7 +25,7 @@ const isActive = (href: string) =>
   </a>
   <nav aria-label="主导航">
     {items.map((it) => (
-      <a class:list={['side-link', { active: isActive(it.href), 'day-only': it.dayOnly }]} href={it.href} data-nav-link aria-current={isActive(it.href) ? 'page' : undefined}>
+      <a class:list={['side-link', { active: isActive(it.href) }]} href={it.href} data-nav-link aria-current={isActive(it.href) ? 'page' : undefined}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[it.icon]} />
         <span>{it.label}</span>
       </a>

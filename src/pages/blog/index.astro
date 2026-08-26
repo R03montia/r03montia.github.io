@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { sortPosts } from '../../utils/posts';
 
-const posts = sortPosts(await getCollection('blog'));
+const posts = sortPosts(await getCollection('blog', (p) => !p.data.night));
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 ---
 <BaseLayout title="博客 | R03montia" description="全部文章。">
