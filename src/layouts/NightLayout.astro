@@ -87,6 +87,24 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         if (window.scrollY > 0 && !location.hash) window.scrollTo(0, 0);
       });
 
+      // hero 视差:滚动时背景图以低速率跟随,营造纵深。只在有 hero 的页面上工作。
+      const heroEl = document.querySelector<HTMLElement>('.night-hero');
+      if (heroEl) {
+        let rafId = 0;
+        const updateParallax = () => {
+          rafId = 0;
+          heroEl.style.setProperty('--hero-scroll', String(window.scrollY));
+        };
+        const onParallaxScroll = () => {
+          if (!rafId) rafId = requestAnimationFrame(updateParallax);
+        };
+        window.addEventListener('scroll', onParallaxScroll, { passive: true });
+        document.addEventListener('astro:before-swap', () => {
+          window.removeEventListener('scroll', onParallaxScroll);
+          if (rafId) cancelAnimationFrame(rafId);
+        }, { once: true });
+      }
+
       // 站内搜索:与表版 BaseLayout 同一份 pagefind 客户端
       type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
       type Pagefind = { search: (q: string) => Promise<{ results: PagefindResult[] }> };
@@ -163,6 +181,15 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         backdrop-filter: blur(1rem);
         -webkit-backdrop-filter: blur(1rem);
         border-bottom: 1px solid rgb(var(--line) / 0.3);
+        /* 进入里版时从顶部滑入 */
+        animation: topbar-slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s backwards;
+      }
+      @keyframes topbar-slide-in {
+        from { transform: translateY(-100%); opacity: 0; }
+        to   { transform: translateY(0);     opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .night-topbar { animation: none; }
       }
       .night-brand {
         font-family: var(--font-deco);
@@ -299,16 +326,35 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         justify-content: center;
         text-align: center;
         overflow: hidden;
-        /* 底色先兜一层实色,防止图片/渐变未加载时透出页面底 */
+        /* 底色 + 渐变 + 光晕;背景图放到 ::before 上做视差 */
         background-color: rgb(var(--body-bg));
-        /* 预留:--hero-bg-img 由组件 props 传入;空时只有渐变,有值时渐变叠在图上 */
         background-image:
-          linear-gradient(to bottom, rgb(var(--body-bg) / 0.55), rgb(var(--body-bg) / 0.85)),
-          var(--hero-bg-img, none),
           radial-gradient(ellipse 80% 50% at 50% 30%, rgb(60 70 110 / 0.45), transparent 70%);
-        background-size: cover, cover, cover;
-        background-position: center, center, center;
+        background-size: cover;
+        background-position: center;
         background-repeat: no-repeat;
+      }
+      /* hero 背景视差:图片层,滚动时以 0.4 倍速率移动,营造纵深。
+         未设 --hero-bg-img 时 background-image: none,整层透明,只剩主背景。 */
+      .night-hero::before {
+        content: '';
+        position: absolute;
+        inset: -10%;
+        background-image: var(--hero-bg-img, none);
+        background-size: cover;
+        background-position: center;
+        transform: translateY(calc(var(--hero-scroll, 0) * 0.4px));
+        z-index: 0;
+        pointer-events: none;
+      }
+      /* 暗化蒙版,保证文字可读;独立于 ::before,这样视差不会把蒙版一起带走 */
+      .night-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgb(var(--body-bg) / 0.55), rgb(var(--body-bg) / 0.85));
+        z-index: 1;
+        pointer-events: none;
       }
       .night-hero-inner {
         position: relative;
@@ -327,6 +373,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         background-clip: text;
         color: transparent;
         text-shadow: 0 0 60px rgb(120 140 255 / 0.25);
+        opacity: 0;
+        transform: translateY(1.2rem);
+        filter: blur(8px);
+        animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
       }
       .night-hero-sub {
         margin: 1.5rem 0 0;
@@ -335,6 +385,24 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         line-height: 1.8;
         letter-spacing: 0.08em;
         text-shadow: 0 0 3px black, 0 0 8px black;
+        opacity: 0;
+        transform: translateY(0.8rem);
+        filter: blur(6px);
+        animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+      }
+      /* 标题/副标题共用浮现动画:上浮 + 褪模糊 + 渐入 */
+      @keyframes hero-rise {
+        to { opacity: 1; transform: translateY(0); filter: blur(0); }
+      }
+      /* 标题呼吸:浮现完成后,文字光晕缓慢一明一暗 */
+      .night-hero-title {
+        animation:
+          hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards,
+          hero-breathe 5s ease-in-out 1.2s infinite;
+      }
+      @keyframes hero-breathe {
+        0%, 100% { text-shadow: 0 0 60px rgb(120 140 255 / 0.22); }
+        50%      { text-shadow: 0 0 80px rgb(120 140 255 / 0.45); }
       }
       .night-hero-hint {
         position: absolute;
@@ -343,14 +411,28 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         transform: translateX(-50%);
         color: rgb(var(--text-secondary));
         font-size: 1.4rem;
-        animation: hero-hint-bob 2.2s ease-in-out infinite;
+        opacity: 0;
+        animation:
+          hint-fade-in 0.6s ease-out 1.4s forwards,
+          hero-hint-bob 2.2s ease-in-out 2s infinite;
+      }
+      @keyframes hint-fade-in {
+        to { opacity: 0.7; }
       }
       @keyframes hero-hint-bob {
-        0%, 100% { transform: translate(-50%, 0); opacity: 0.6; }
-        50%      { transform: translate(-50%, 0.5rem); opacity: 1; }
+        0%, 100% { transform: translate(-50%, 0); }
+        50%      { transform: translate(-50%, 0.5rem); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .night-hero-hint { animation: none; }
+        .night-hero-title,
+        .night-hero-sub,
+        .night-hero-hint {
+          animation: none !important;
+          opacity: 1 !important;
+          transform: none !important;
+          filter: none !important;
+        }
+        .night-hero-hint { opacity: 0.7 !important; }
       }
 
       /* 里版隐藏表版的明暗切换按钮相关(此 layout 本就不渲染那些按钮) */
