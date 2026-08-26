@@ -62,3 +62,6 @@ design-references/
 # HEIC wallpaper source (keep the PNG)
 public/wallpaper.heic
 docs/wallpaper.heic
+
+# Claude Code local-only settings (machine-specific paths / permissions)
+.claude/settings.local.json

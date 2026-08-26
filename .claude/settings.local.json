@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Skill(update-config)",
-      "Bash(cd \"\\\\\\\\wsl.localhost\\\\Ubuntu-24.04\\\\root\\\\code\\\\personal-website\")",
-      "Read(///wsl.localhost/Ubuntu-24.04/wsl.localhost/Ubuntu-24.04/root/code/**)"
-    ]
-  }
-}
