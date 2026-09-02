@@ -1,5 +1,11 @@
 [
   {
+    "name": "agent-self-evolution",
+    "description": "让 AI 编码助手从每次任务中自动学习、沉淀技能与记忆的开源系统（The agent that grows with you）— Pi / Claude Code / Codex。",
+    "tech": ["Python"],
+    "url": "https://github.com/R03montia/agent-self-evolution"
+  },
+  {
     "name": "r03montia.github.io",
     "description": "本站源码：R03montia 的个人站点，Astro 静态博客。",
     "tech": ["Astro", "CSS", "TypeScript"],

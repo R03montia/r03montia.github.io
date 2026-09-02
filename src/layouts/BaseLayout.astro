@@ -185,7 +185,7 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           }
         });
       };
-      // 里版·夜 触发:页面滚到底后继续下拉滚轮 3 次,坠入夜晚。
+      // 里版·夜 触发:页面滚到底后累计 4 次下拉滚轮,坠入夜晚。
       // 每次下拽整页轻微下沉 + 变暗作张力提示;触发后只播 body 级的
       // "night-fall" 动画(不加 data-night — 否则表版会闪出旧里版皮肤),
       // 动画中段跳转到 /inside/,由 NightLayout 自己的 SSR data-night 接管夜色。
@@ -196,8 +196,8 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           window.location.href = '/inside/';
         }, 350);
       };
-      const NIGHT_PULLS_NEEDED = 3;
-      const NIGHT_PULL_WINDOW_MS = 1500;
+      const NIGHT_PULLS_NEEDED = 4;
+      const NIGHT_PULL_WINDOW_MS = 2500;
       let nightPullCount = 0;
       let nightPullTimer: ReturnType<typeof setTimeout> | null = null;
       let nightLockUntil = 0;
@@ -213,9 +213,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         const atBottom = doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 4;
         if (!atBottom) { resetNightPull(); return; }
         nightPullCount += 1;
+        const hintLevel = Math.ceil(nightPullCount / (NIGHT_PULLS_NEEDED / 3));
         document.body.classList.add('night-hint');
         document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
-        document.body.classList.add(`night-hint-${Math.min(nightPullCount, 3)}`);
+        document.body.classList.add(`night-hint-${Math.min(hintLevel, 3)}`);
         if (nightPullTimer) clearTimeout(nightPullTimer);
         if (nightPullCount >= NIGHT_PULLS_NEEDED) {
           nightLockUntil = Date.now() + 1000;
