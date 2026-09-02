@@ -2,9 +2,9 @@
 import { getCollection } from 'astro:content';
 import NightLayout from '../../../layouts/NightLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
-import { sortPosts } from '../../../utils/posts';
+import { sortListedPosts } from '../../../utils/posts';
 
-const posts = sortPosts(await getCollection('blog', (p) => p.data.night));
+const posts = sortListedPosts(await getCollection('blog', (p) => p.data.night && !p.data.draft));
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 ---
 <NightLayout title="夜里 · 下反熔毁集群" description="里版全部文章。">

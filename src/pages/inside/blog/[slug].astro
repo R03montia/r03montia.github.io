@@ -1,32 +1,39 @@
 ---
 import { getCollection, render } from 'astro:content';
 import NightLayout from '../../../layouts/NightLayout.astro';
-import { readingTime, sortPosts } from '../../../utils/posts';
+import { getRelatedPosts, readingTime, sortPosts } from '../../../utils/posts';
 
 export async function getStaticPaths() {
-  const posts = sortPosts(await getCollection('blog', (p) => p.data.night));
+  const posts = sortPosts(await getCollection('blog', (p) => p.data.night && !p.data.draft));
   return posts.map((post, i) => ({
     params: { slug: post.id },
     props: {
       post,
       prev: i > 0 ? posts[i - 1] : null,
       next: i < posts.length - 1 ? posts[i + 1] : null,
+      relatedPosts: getRelatedPosts(post, posts),
     },
   }));
 }
 
-const { post, prev, next } = Astro.props;
+const { post, prev, next, relatedPosts } = Astro.props;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
-<NightLayout title={`${post.data.title} | 下反熔毁集群`} description={post.data.description}>
+<NightLayout title={`${post.data.title} | 下反熔毁集群`} description={post.data.description} ogImage={post.data.cover}>
   <div class="progress-bar" aria-hidden="true"><span class="progress-fill"></span></div>
   <article class="post-card card post">
     <header>
       <h1>{post.data.title}</h1>
       <div class="meta">
         <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+        {post.data.updated && (
+          <span>
+            更新于
+            <time datetime={post.data.updated.toISOString()}>{fmt.format(post.data.updated)}</time>
+          </span>
+        )}
         <span>约 {readingTime(post.body ?? '')} 分钟</span>
         {post.data.tags.map((t) => <a href={`/inside/tag/${t}/`}>#{t}</a>)}
       </div>
@@ -59,6 +66,20 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
           </a>
         ) : <span />}
       </nav>
+    )}
+
+    {relatedPosts.length > 0 && (
+      <section class="related-posts" aria-labelledby="related-posts-title">
+        <h2 id="related-posts-title">相关阅读</h2>
+        <div class="related-grid">
+          {relatedPosts.map((related) => (
+            <a class="related-card" href={`/inside/blog/${related.id}/`}>
+              <span class="related-title">{related.data.title}</span>
+              <span class="related-desc">{related.data.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
     )}
   </article>
 </NightLayout>
@@ -167,8 +188,46 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
   .post-nav-link.next { text-align: right; align-items: flex-end; }
   .post-nav-dir { font-size: 0.72rem; color: rgb(var(--text-secondary)); font-family: var(--font-ui); }
   .post-nav-title { font-size: 0.86rem; font-family: var(--font-ui); }
+
+  .related-posts { margin-top: 2rem; }
+  .related-posts h2 {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    margin: 0 0 0.9rem;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.85rem;
+    border: 1px solid rgb(var(--line) / 0.4);
+    border-radius: 8px;
+    background: rgb(var(--content-bg) / 0.25);
+    color: inherit;
+  }
+  .related-card:hover { text-decoration: none; background: rgb(var(--content-bg) / 0.6); }
+  .related-title {
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+  .related-desc {
+    color: rgb(var(--text-secondary));
+    font-size: 0.78rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
   @media (max-width: 48rem) {
     .post-nav { grid-template-columns: 1fr; }
     .post-nav-link.next { text-align: left; align-items: flex-start; }
+    .related-grid { grid-template-columns: 1fr; }
   }
 </style>

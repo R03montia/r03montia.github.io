@@ -4,7 +4,7 @@ import NightLayout from '../../layouts/NightLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { sortPosts } from '../../utils/posts';
 
-const all = sortPosts(await getCollection('blog'));
+const all = sortPosts(await getCollection('blog', (p) => !p.data.draft));
 const nightPosts = all.filter((p) => p.data.night);
 ---
 <NightLayout title="石 / 火 / 梦 / 身" description="下反熔毁集群 · 里版" hero>

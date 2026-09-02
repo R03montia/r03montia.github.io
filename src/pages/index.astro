@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { sortPosts } from '../utils/posts';
 
-const recent = sortPosts(await getCollection('blog', (p) => !p.data.night)).slice(0, 5);
+const recent = sortPosts(await getCollection('blog', (p) => !p.data.night && !p.data.draft)).slice(0, 5);
 ---
 <BaseLayout title="R03montia" description="R03montia 的个人站点：博客、项目与关于。">
   <section class="hero card">

@@ -7,7 +7,7 @@ interface Props {
   night?: boolean;
 }
 const { post, night = false } = Astro.props;
-const { title, date, tags, description } = post.data;
+const { title, date, tags, description, pinned } = post.data;
 const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 const postUrl = night ? `/inside/blog/${post.id}/` : `/blog/${post.id}/`;
 const tagUrl = (t: string) => (night ? `/inside/tag/${t}/` : `/tag/${t}/`);
@@ -19,6 +19,7 @@ const tagUrl = (t: string) => (night ? `/inside/tag/${t}/` : `/tag/${t}/`);
   </div>
   <p class="pc-desc">{description}</p>
   <div class="pc-meta">
+    {pinned && <span class="pinned">置顶</span>}
     <span>约 {readingTime(post.body ?? '')} 分钟</span>
     {tags.map((t) => <span class="tag">#{t}</span>)}
   </div>
@@ -39,4 +40,10 @@ const tagUrl = (t: string) => (night ? `/inside/tag/${t}/` : `/tag/${t}/`);
   .pc-desc { color: rgb(var(--text-secondary)); font-size: 0.9rem; margin: 0.4rem 0 0.6rem; }
   .pc-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.78rem; color: rgb(var(--text-secondary)); }
   .tag { color: rgb(var(--accent)); }
+  .pinned {
+    color: rgb(var(--accent));
+    border: 1px solid rgb(var(--accent) / 0.45);
+    border-radius: 999px;
+    padding: 0 0.35rem;
+  }
 </style>
