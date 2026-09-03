@@ -1,0 +1,56 @@
+---
+// 右下角 Live2D 看板娘。这里直接用 l2d，绕开 l2d-widget 对 model3 的加载问题。
+---
+
+<script>
+  import { init, type L2D } from 'l2d';
+
+  let widget: L2D | null = null;
+
+  const destroyWidget = () => {
+    widget?.destroy();
+    widget = null;
+  };
+
+  const initWidget = () => {
+    const canvas = document.querySelector<HTMLCanvasElement>('.l2d-widget canvas');
+    if (!canvas || widget) return;
+
+    widget = init(canvas);
+    widget.load({
+      path: 'https://model.hacxy.cn/Hiyori/Hiyori.model3.json',
+      scale: 2.1,
+      position: [0.3, -1.1],
+      volume: 0,
+      logLevel: 'warn',
+    });
+  };
+
+  initWidget();
+
+  document.addEventListener('astro:before-swap', destroyWidget);
+  document.addEventListener('astro:after-swap', initWidget);
+</script>
+
+<div class="l2d-widget" aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .l2d-widget {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 300px;
+    height: 300px;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  .l2d-widget canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: auto;
+  }
+</style>
