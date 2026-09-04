@@ -17,10 +17,15 @@ const title = '夜里无门';
   </head>
   <body>
     <main class="denied-shell">
+      <div class="denied-grid" aria-hidden="true"></div>
+      <div class="denied-hatch" aria-hidden="true"></div>
       <section class="denied-card">
-        <p class="denied-mark" aria-hidden="true">×</p>
-        <h1>夜里无门</h1>
-        <p>低语没有被听见。这片夜色暂时不肯回应。</p>
+        <p class="denied-warning">该页面属于</p>
+        <h1 class="denied-forbidden glitch-hover" data-text="立入禁止">立入禁止</h1>
+        <p class="denied-copy">无意中来到这里的访客啊，请你快快回去</p>
+        <p class="denied-copy">反熔毁集群在恒久的监视着这个页面</p>
+        <p class="denied-copy">如果你执意要访问，请记住这句话——</p>
+        <p class="denied-verse glitch-hover" data-text="其一为四，苦难盘桓">其一为四，苦难盘桓</p>
         <div class="denied-actions">
           <a class="surface-link" href="/">↑ 返回地表</a>
           <a class="retry-link" href="/inside-gate/">重试入口</a>
@@ -39,6 +44,8 @@ const title = '夜里无门';
         min-height: 100vh;
         margin: 0;
         background: linear-gradient(to bottom, #131521, #0c0b11 72%);
+        position: relative;
+        overflow: hidden;
       }
 
       .denied-shell {
@@ -46,36 +53,176 @@ const title = '夜里无门';
         display: grid;
         place-items: center;
         padding: 2rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ===== 漂移网格（借鉴 SCP Enlightened Eyes pw-grid-drift） ===== */
+      .denied-grid {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          repeating-linear-gradient(to right, rgba(26, 26, 32, 0.9) 0px, rgba(26, 26, 32, 0.9) 1px, transparent 1px, transparent 44px),
+          repeating-linear-gradient(to bottom, rgba(26, 26, 32, 0.9) 0px, rgba(26, 26, 32, 0.9) 1px, transparent 1px, transparent 22px);
+        animation: pw-grid-drift 60s linear infinite;
+        will-change: background-position;
+        opacity: 0.3;
+      }
+
+      /* ===== 斜纹纹理（借鉴 SCP Enlightened Eyes pw-hatch-drift） ===== */
+      .denied-hatch {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M0 56L56 0M-14 14L14 -14M42 70L70 42' stroke='rgba(120,40,40,0.12)' stroke-width='1'/%3E%3Cpath d='M0 0L56 56M-14 42L14 70M42 -14L70 14' stroke='rgba(120,40,40,0.12)' stroke-width='1'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 56px 56px;
+        mask-image:
+          radial-gradient(ellipse 60% 50% at 0% 0%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 100% 0%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 0% 100%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 100% 100%, black 15%, transparent 60%);
+        -webkit-mask-image:
+          radial-gradient(ellipse 60% 50% at 0% 0%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 100% 0%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 0% 100%, black 15%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 100% 100%, black 15%, transparent 60%);
+        mask-composite: add;
+        -webkit-mask-composite: source-over;
+        animation: pw-hatch-drift 20s linear infinite;
+        will-change: background-position;
+      }
+
+      @keyframes pw-grid-drift {
+        from { background-position: 0 0, 0 0; }
+        to   { background-position: 44px 22px, 44px 22px; }
+      }
+
+      @keyframes pw-hatch-drift {
+        from { background-position: 0 0; }
+        to   { background-position: 56px 56px; }
       }
 
       .denied-card {
-        width: min(24rem, 100%);
-        padding: 2.5rem 2rem;
-        border: 1px solid rgb(90 94 118 / 0.24);
+        width: min(28rem, 100%);
+        padding: 3rem 2.5rem;
+        border: 1px solid rgb(140 40 40 / 0.32);
         border-radius: 1rem;
-        background: rgb(17 18 26 / 0.62);
+        background: rgb(14 12 16 / 0.78);
         text-align: center;
+        backdrop-filter: blur(1.2rem);
+        -webkit-backdrop-filter: blur(1.2rem);
+        box-shadow: 0 1.2rem 3rem -1rem rgb(0 0 0 / 0.7);
       }
 
-      .denied-mark {
-        margin: 0;
-        font-size: 2rem;
-        line-height: 1;
-        color: rgb(170 175 195 / 0.42);
+      .denied-warning {
+        margin: 0 0 0.8rem;
+        font-size: 0.95rem;
+        letter-spacing: 0.1em;
+        color: rgb(180 185 195 / 0.72);
       }
 
       h1 {
-        margin: 1rem 0 0.7rem;
-        font-family: var(--font-deco);
-        font-size: 1.8rem;
-        font-weight: 400;
-        letter-spacing: 0.14em;
+        margin: 0 0 1.2rem;
+        font-size: clamp(4rem, 14vw, 6rem);
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        line-height: 1;
+        color: rgb(220 40 40);
+        text-shadow: 0 0 18px rgb(200 30 30 / 0.4);
+        cursor: default;
       }
 
-      p {
-        margin: 0 0 2rem;
-        font-size: 0.9rem;
-        color: rgb(164 168 180 / 0.72);
+      .denied-copy {
+        margin: 0 0 0.7rem;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: rgb(170 175 188 / 0.82);
+      }
+
+      .denied-verse {
+        margin: 1.6rem 0 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        color: rgb(230 50 50);
+        text-shadow: 0 0 10px rgb(220 40 40 / 0.35);
+        cursor: default;
+      }
+
+      /* ===== hover 触发 glitch（借鉴 SCP component:glitch-elements） ===== */
+      .glitch-hover {
+        position: relative;
+        display: inline-block;
+        transition: color 0.1s ease;
+      }
+
+      .glitch-hover::before,
+      .glitch-hover::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.08s ease;
+      }
+
+      .glitch-hover::before {
+        color: rgba(255, 30, 30, 0.75);
+        z-index: -1;
+      }
+
+      .glitch-hover::after {
+        color: rgba(0, 200, 255, 0.75);
+        z-index: -2;
+      }
+
+      .glitch-hover:hover::before {
+        opacity: 1;
+        animation: ge-anim-top 0.3s linear infinite;
+      }
+
+      .glitch-hover:hover::after {
+        opacity: 1;
+        animation: ge-anim-bottom 0.3s linear infinite;
+      }
+
+      .glitch-hover:hover {
+        animation: ge-anim-base 0.3s linear infinite;
+      }
+
+      @keyframes ge-anim-base {
+        0%    { transform: translate(-0.05em, -0.025em) skew(0deg); }
+        14%   { transform: translate(-0.05em, -0.025em) skew(0deg); }
+        15%   { transform: translate(0.025em, 0.025em) skew(0deg); }
+        49%   { transform: translate(0.025em, 0.025em) skew(5deg); }
+        50%   { transform: translate(0.05em, 0) skew(5deg); }
+        99%   { transform: translate(0.05em, 0) skew(0deg); }
+        100%  { transform: translate(-0.025em, -0.025em) skew(0deg); }
+      }
+
+      @keyframes ge-anim-top {
+        2%, 64%  { transform: translate(-2%, -2%); }
+        4%, 60%  { transform: translate(2%, -2%); }
+        62%      { transform: translate(15%, 0.5%) skew(-15deg); }
+      }
+
+      @keyframes ge-anim-bottom {
+        2%, 64%  { transform: translate(-2%, 0); }
+        4%, 60%  { transform: translate(-2%, 0); }
+        62%      { transform: translate(-10%, 1%) skew(35deg); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .denied-grid, .denied-hatch, .glitch-hover, .glitch-hover::before, .glitch-hover::after {
+          animation: none !important;
+          transition: none !important;
+        }
       }
 
       .denied-actions {
@@ -83,6 +230,7 @@ const title = '夜里无门';
         justify-content: center;
         gap: 1rem;
         flex-wrap: wrap;
+        margin-top: 2.2rem;
       }
 
       a {
@@ -92,12 +240,12 @@ const title = '夜里无门';
       }
 
       .surface-link {
-        border: 1px solid rgb(130 136 164 / 0.36);
+        border: 1px solid rgb(140 40 40 / 0.36);
         color: rgb(210 214 228 / 0.82);
       }
 
       .retry-link {
-        color: rgb(158 171 255 / 0.84);
+        color: rgb(220 80 80 / 0.84);
       }
     </style>
   </body>
