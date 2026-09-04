@@ -64,16 +64,15 @@ const watchers = watcherBlueprints.map((watcher) => ({
               </svg>
             ) : (
               <svg viewBox="0 0 120 80" role="presentation" focusable="false">
-                <path class="camera-shell" d="M8 30L20 20H64L72 28V54L64 62H20L8 52Z" />
-                <path class="camera-housing" d="M68 34H92L102 40V44L92 50H68Z" />
-                <path class="camera-mount" d="M28 10H52M34 10V20M46 10V20" />
-                <path class="camera-brace" d="M64 24L78 30M64 58L78 52" />
-                <path class="camera-line" d="M16 36H32M16 44H26M16 52H32" />
-                <rect class="camera-rec" x="38" y="28" width="6" height="6" />
+                <path class="camera-brace" d="M44 10H76" />
+                <path class="camera-mount" d="M60 10V24" />
+                <rect class="camera-shell" x="22" y="24" width="76" height="48" rx="10" />
+                <path class="camera-line" d="M32 66H42M78 66H88" />
+                <rect class="camera-rec" x="88" y="30" width="6" height="6" rx="3" />
                 <g class="look">
-                  <circle class="camera-ring" cx="94" cy="41" r="14" />
-                  <circle class="camera-lens" cx="94" cy="41" r="9" />
-                  <circle class="camera-pupil" cx="94" cy="41" r="4" />
+                  <circle class="camera-ring" cx="60" cy="48" r="20" />
+                  <circle class="camera-lens" cx="60" cy="48" r="12" />
+                  <circle class="camera-pupil" cx="60" cy="48" r="5" />
                 </g>
               </svg>
             )}
