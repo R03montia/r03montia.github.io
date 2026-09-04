@@ -22,7 +22,6 @@ const {
 // 然后把这一行的值改成对应路径(例如 '/images/night-hero.jpg')即可启用。
 const heroBgImage = '/images/night-hero.jpg';
 const heroHoverBgImage = '/images/night-hero-hover.webp';
-const heroBlurredBgImage = '/images/night-hero-blurred.webp';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 ---
@@ -49,15 +48,6 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     <ClientRouter />
   </head>
   <body>
-    {hero && (
-      <div
-        class="night-hero-stage"
-        aria-hidden="true"
-        style={`--hero-bg-img: url(${heroBgImage}); --hero-hover-bg-img: url(${heroHoverBgImage}); --hero-blurred-bg-img: url(${heroBlurredBgImage})`}
-      >
-        <div class="night-hero-hover-bg"></div>
-      </div>
-    )}
     <header class="night-topbar">
       <a class="night-brand" href="/inside/">石 / 火 / 梦 / 身</a>
       <div class="night-search">
@@ -73,7 +63,9 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       {hero && (
         <section
           class="night-hero"
+          style={heroBgImage ? `--hero-bg-img: url(${heroBgImage}); --hero-hover-bg-img: url(${heroHoverBgImage})` : undefined}
         >
+          <div class="night-hero-hover-bg" aria-hidden="true"></div>
           <div class="night-hero-inner">
             <h1 class="night-hero-title">下反熔毁集群</h1>
             <p class="night-hero-sub">
@@ -102,6 +94,24 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       document.addEventListener('astro:after-swap', () => {
         if (window.scrollY > 0 && !location.hash) window.scrollTo(0, 0);
       });
+
+      // hero 视差:滚动时背景图以低速率跟随,营造纵深。只在有 hero 的页面上工作。
+      const heroEl = document.querySelector<HTMLElement>('.night-hero');
+      if (heroEl) {
+        let rafId = 0;
+        const updateParallax = () => {
+          rafId = 0;
+          heroEl.style.setProperty('--hero-scroll', String(window.scrollY));
+        };
+        const onParallaxScroll = () => {
+          if (!rafId) rafId = requestAnimationFrame(updateParallax);
+        };
+        window.addEventListener('scroll', onParallaxScroll, { passive: true });
+        document.addEventListener('astro:before-swap', () => {
+          window.removeEventListener('scroll', onParallaxScroll);
+          if (rafId) cancelAnimationFrame(rafId);
+        }, { once: true });
+      }
 
       // 站内搜索:与表版 BaseLayout 同一份 pagefind 客户端
       type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
@@ -306,58 +316,12 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         padding: 0;
       }
       .night-main.with-hero .night-body {
-        /* 参照 theme:another-night:#content-wrap 会向上进入版头底部 15vh。
-           这里把上移的 15vh 全部还给顶部 padding,所以正文内容位置不变。 */
-        max-width: none;
-        margin: -15vh auto 0;
-        padding: calc(15vh + 2.5rem) max(1.5rem, calc((100% - 46rem) / 2)) calc(5rem + env(safe-area-inset-bottom));
-        background: linear-gradient(to bottom, transparent, rgb(var(--body-bg) / .65) 15vh, rgb(var(--body-bg) / .65));
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem calc(5rem + env(safe-area-inset-bottom));
       }
       .night-main:not(.with-hero) .night-body {
         /* 非 hero 页 night-body 是直通容器,无样式 */
-      }
-
-      /* 参照 theme:another-night 的 #extrac-div-1:清晰头图固定在 100vh 舞台上。 */
-      .night-hero-stage {
-        position: fixed;
-        display: block;
-        z-index: -3;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: var(--hero-bg-img) center / cover no-repeat;
-      }
-
-      /* 参照 theme:another-night 的 #extrac-div-1::before:
-         模糊图是预先导出的资源,默认不显示,进入正文后切换。 */
-      .night-hero-stage::before {
-        content: '';
-        position: fixed;
-        display: block;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: var(--hero-blurred-bg-img) center / cover no-repeat;
-        opacity: 0;
-        transition: all 1s ease-in-out;
-        z-index: 2;
-      }
-
-      /* 参照 theme:another-night 的自动模糊:
-        预模糊层负责背景纹理,舞台 filter 负责模糊/压暗。 */
-      body:has(.night-main.with-hero) {
-        background: none;
-      }
-      body:has(.night-body:hover) .night-hero-stage::before {
-        opacity: 1;
-      }
-      body:has(.night-body:hover) .night-hero-stage {
-        filter: blur(1.5px) brightness(.33);
-      }
-      .night-hero-stage {
-        will-change: filter;
       }
 
       /* 里版 hero:100vh 全屏,大标题居中,底部"↓"提示下滚 */
@@ -370,6 +334,26 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         justify-content: center;
         text-align: center;
         overflow: hidden;
+        /* 底色 + 渐变 + 光晕;背景图放到 ::before 上做视差 */
+        background-color: rgb(var(--body-bg));
+        background-image:
+          radial-gradient(ellipse 80% 50% at 50% 30%, rgb(60 70 110 / 0.45), transparent 70%);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      /* hero 背景视差:图片层,滚动时以 0.4 倍速率移动,营造纵深。
+         未设 --hero-bg-img 时 background-image: none,整层透明,只剩主背景。 */
+      .night-hero::before {
+        content: '';
+        position: absolute;
+        inset: -10%;
+        background-image: var(--hero-bg-img, none);
+        background-size: cover;
+        background-position: center;
+        transform: translateY(calc(var(--hero-scroll, 0) * 0.4px));
+        z-index: 0;
+        pointer-events: none;
       }
       /* 暗化蒙版,保证文字可读;独立于 ::before,这样视差不会把蒙版一起带走 */
       .night-hero::after {
@@ -387,17 +371,18 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       }
       .night-hero-hover-bg {
         position: absolute;
-        inset: 0;
+        inset: -10%;
         background-image: var(--hero-hover-bg-img, var(--hero-bg-img, none));
         background-size: cover;
         background-position: center;
-        z-index: 1;
+        transform: translateY(calc(var(--hero-scroll, 0) * 0.4px));
+        z-index: 0;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.6s ease;
         will-change: opacity, transform;
       }
-      body:has(.night-hero-title:hover) .night-hero-hover-bg {
+      .night-hero:has(.night-hero-title:hover) .night-hero-hover-bg {
         opacity: 1;
       }
       .night-hero-title {
