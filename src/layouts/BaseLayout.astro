@@ -13,12 +13,15 @@ interface Props {
   description?: string;
   ogImage?: string;
   ogType?: 'website' | 'article';
+  /** 独立挂机模式：隐藏常规栏架，仅保留全站氛围层。 */
+  idle?: boolean;
 }
 const {
   title,
   description = 'R03montia 的个人站点。',
   ogImage = '/og.jpg',
   ogType = 'website',
+  idle = false,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
@@ -60,11 +63,11 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       })();
     </script>
   </head>
-  <body>
+  <body class:list={{ 'idle-active': idle }}>
     <a class="skip-link" href="#main-content">跳到主内容</a>
     <div class="app">
-      <Sidebar />
-      <main id="main-content" class="main-area">
+      {!idle && <Sidebar />}
+      <main id="main-content" class:list={['main-area', { 'idle-main': idle }]}>
         <slot />
       </main>
     </div>
@@ -74,18 +77,22 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     </div>
     <div class="rain-overlay" aria-hidden="true" transition:persist></div>
     <slot name="after-main" />
-    <header class="mobile-topbar">
-      <button id="menu-toggle" type="button" aria-controls="main-sidebar" aria-expanded="false" aria-label="打开菜单">
-        <span class="hamb"><span></span><span></span><span></span></span>
+    {!idle && (
+      <header class="mobile-topbar">
+        <button id="menu-toggle" type="button" aria-controls="main-sidebar" aria-expanded="false" aria-label="打开菜单">
+          <span class="hamb"><span></span><span></span><span></span></span>
+        </button>
+        <a class="mobile-brand" href="/">R03montia</a>
+      </header>
+    )}
+    {!idle && <div id="drawer-backdrop"></div>}
+    {!idle && (
+      <button id="back-to-top" type="button" aria-label="回到顶部" title="回到顶部">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 19V5" /><path d="M5 12l7-7 7 7" />
+        </svg>
       </button>
-      <a class="mobile-brand" href="/">R03montia</a>
-    </header>
-    <div id="drawer-backdrop"></div>
-    <button id="back-to-top" type="button" aria-label="回到顶部" title="回到顶部">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 19V5" /><path d="M5 12l7-7 7 7" />
-      </svg>
-    </button>
+    )}
     <Live2DWidget />
     <script>
       const toggleTheme = () => {
@@ -540,6 +547,13 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     max-width: 60rem;
     margin: 0 auto;
     padding: 2.5rem 1.5rem calc(5rem + env(safe-area-inset-bottom));
+  }
+  .main-area.idle-main {
+    max-width: none;
+    min-height: 100vh;
+    padding: 0;
+    display: grid;
+    place-items: center;
   }
   @media (max-width: 48rem) {
     .app { display: block; }
