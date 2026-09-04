@@ -1,6 +1,6 @@
 ---
 title: 寻心记
-description: 一场穿越大海、茶楼与雨夜的寻心之旅。
+description: 群觅。
 date: 2026-08-26
 tags: [原创, 故事]
 night: true
