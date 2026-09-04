@@ -27,7 +27,7 @@ const title = '夜里无门';
         <p class="denied-verse glitch-hover" data-text="其一为四，苦难盘桓">其一为四，苦难盘桓</p>
         <div class="denied-actions">
           <a class="surface-link" href="/">↑ 返回地表</a>
-          <a class="retry-link" href="/inside-gate/">重试入口</a>
+          <a class="retry-link glitch-hover" data-text="重试入口" href="/inside-gate/">重试入口</a>
         </div>
       </section>
     </main>
@@ -158,6 +158,7 @@ const title = '夜里无门';
         position: relative;
         display: inline-block;
         transition: color 0.1s ease;
+        isolation: isolate;
       }
 
       .glitch-hover::before,
