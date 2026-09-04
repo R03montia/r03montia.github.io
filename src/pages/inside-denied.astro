@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+
+const title = '夜里无门';
+---
+
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="密码不正确。" />
+    <meta name="theme-color" content="#100f14" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="denied-shell">
+      <section class="denied-card">
+        <p class="denied-mark" aria-hidden="true">×</p>
+        <h1>夜里无门</h1>
+        <p>低语没有被听见。这片夜色暂时不肯回应。</p>
+        <div class="denied-actions">
+          <a class="surface-link" href="/">↑ 返回地表</a>
+          <a class="retry-link" href="/inside-gate/">重试入口</a>
+        </div>
+      </section>
+    </main>
+
+    <style>
+      :global(html) {
+        background: #0d0c12;
+        color: #d8dae2;
+        font-family: var(--font-body);
+      }
+
+      :global(body) {
+        min-height: 100vh;
+        margin: 0;
+        background: linear-gradient(to bottom, #131521, #0c0b11 72%);
+      }
+
+      .denied-shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+      }
+
+      .denied-card {
+        width: min(24rem, 100%);
+        padding: 2.5rem 2rem;
+        border: 1px solid rgb(90 94 118 / 0.24);
+        border-radius: 1rem;
+        background: rgb(17 18 26 / 0.62);
+        text-align: center;
+      }
+
+      .denied-mark {
+        margin: 0;
+        font-size: 2rem;
+        line-height: 1;
+        color: rgb(170 175 195 / 0.42);
+      }
+
+      h1 {
+        margin: 1rem 0 0.7rem;
+        font-family: var(--font-deco);
+        font-size: 1.8rem;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+      }
+
+      p {
+        margin: 0 0 2rem;
+        font-size: 0.9rem;
+        color: rgb(164 168 180 / 0.72);
+      }
+
+      .denied-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      a {
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+      }
+
+      .surface-link {
+        border: 1px solid rgb(130 136 164 / 0.36);
+        color: rgb(210 214 228 / 0.82);
+      }
+
+      .retry-link {
+        color: rgb(158 171 255 / 0.84);
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,307 @@
+---
+import '@fontsource/nixie-one';
+import '@fontsource/outfit';
+import '@fontsource/atkinson-hyperlegible';
+import '../styles/global.css';
+import {
+  INSIDE_AUTH_STORAGE_KEY,
+  INSIDE_AUTH_TOKEN,
+} from '../utils/inside-auth';
+
+const title = '夜里入口';
+const description = '输入密码进入里版。';
+---
+
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#100f14" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="gate-shell">
+      <section class="gate-card" aria-labelledby="gate-title">
+        <p class="gate-eyebrow">Another Night</p>
+        <h1 id="gate-title">夜里入口</h1>
+        <p class="gate-copy">这里没有路标。只有一次低声的确认。</p>
+
+        <form id="gate-form" autocomplete="off" novalidate>
+          <label class="gate-label" for="inside-password">密码</label>
+          <div class="password-field">
+            <input
+              id="inside-password"
+              name="password"
+              type="password"
+              inputmode="text"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              required
+            />
+            <button
+              id="toggle-inside-password"
+              class="password-toggle"
+              type="button"
+              aria-label="显示密码"
+              aria-pressed="false"
+            >
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 5.8A9.9 9.9 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17.7 17.7 0 0 1-2.4 3.2"></path>
+                <path d="M6.5 7.4A17.6 17.6 0 0 0 2.5 12S6 18.5 12 18.5a9.8 9.8 0 0 0 4.2-.9"></path>
+                <path d="M9.9 10.2a3 3 0 0 0 4.1 4.1"></path>
+              </svg>
+            </button>
+          </div>
+          <button type="submit">进入</button>
+        </form>
+
+        <a class="gate-return" href="/">↑ 返回地表</a>
+      </section>
+    </main>
+
+    <script is:inline define:vars={{ INSIDE_AUTH_STORAGE_KEY, INSIDE_AUTH_TOKEN }}>
+      const getSafeInsideNext = (raw) => {
+        try {
+          const url = new URL(raw || '/inside/', window.location.origin);
+          if (url.origin !== window.location.origin) return '/inside/';
+          if (url.pathname === '/inside') return '/inside/';
+          if (!url.pathname.startsWith('/inside/')) return '/inside/';
+          return url.pathname + url.search + url.hash;
+        } catch {
+          return '/inside/';
+        }
+      };
+
+      const digestInsidePassword = async (password) => {
+        const bytes = new TextEncoder().encode(`inside-v1:${password}`);
+        const digest = await crypto.subtle.digest('SHA-256', bytes);
+        return Array.from(new Uint8Array(digest))
+          .map((byte) => byte.toString(16).padStart(2, '0'))
+          .join('');
+      };
+
+      const verifyInsidePassword = async (password) => {
+        const digest = await digestInsidePassword(password.trim());
+        if (digest.length !== INSIDE_AUTH_TOKEN.length) return false;
+        let difference = 0;
+        for (let index = 0; index < digest.length; index += 1) {
+          difference |= digest.charCodeAt(index) ^ INSIDE_AUTH_TOKEN.charCodeAt(index);
+        }
+        return difference === 0;
+      };
+
+      const isInsideDeviceAuthorized = () => {
+        try {
+          return localStorage.getItem(INSIDE_AUTH_STORAGE_KEY) === INSIDE_AUTH_TOKEN;
+        } catch {
+          return false;
+        }
+      };
+
+      const form = document.getElementById('gate-form');
+      const input = document.getElementById('inside-password');
+      const button = form.querySelector('button[type="submit"]');
+      const passwordToggle = document.getElementById('toggle-inside-password');
+      const eyeOpen = passwordToggle.querySelector('.eye-open');
+      const eyeClosed = passwordToggle.querySelector('.eye-closed');
+
+      passwordToggle.addEventListener('click', () => {
+        const showPassword = input.type === 'password';
+        input.type = showPassword ? 'text' : 'password';
+        passwordToggle.setAttribute('aria-pressed', String(showPassword));
+        passwordToggle.setAttribute('aria-label', showPassword ? '隐藏密码' : '显示密码');
+        passwordToggle.classList.toggle('is-visible', showPassword);
+      });
+
+      const syncPasswordEye = () => {
+        const showPassword = input.type === 'text';
+        eyeOpen.style.display = showPassword ? 'none' : 'block';
+        eyeClosed.style.display = showPassword ? 'block' : 'none';
+      };
+      syncPasswordEye();
+
+      if (isInsideDeviceAuthorized()) {
+        window.location.replace(getSafeInsideNext(new URLSearchParams(window.location.search).get('next')));
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = input.value;
+        if (!password) {
+          input.focus();
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = '确认中…';
+        try {
+          if (await verifyInsidePassword(password)) {
+            localStorage.setItem(INSIDE_AUTH_STORAGE_KEY, INSIDE_AUTH_TOKEN);
+            window.location.replace(
+              getSafeInsideNext(new URLSearchParams(window.location.search).get('next')),
+            );
+            return;
+          }
+          window.location.replace('/inside-denied/');
+        } catch {
+          button.disabled = false;
+          button.textContent = '进入';
+          input.select();
+        }
+      });
+    </script>
+
+    <style>
+      :global(html) {
+        background: #0d0c12;
+        color: #dfe2ec;
+        font-family: var(--font-body);
+      }
+
+      :global(body) {
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(ellipse 80% 48% at 50% -12%, rgb(74 86 132 / 0.3), transparent 62%),
+          linear-gradient(to bottom, #141626, #0d0c12 74%);
+      }
+
+      .gate-shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+      }
+
+      .gate-card {
+        width: min(26rem, 100%);
+        padding: 2.4rem 2.1rem 2rem;
+        border: 1px solid rgb(92 98 128 / 0.32);
+        border-radius: 1rem;
+        background: rgb(20 21 31 / 0.66);
+        box-shadow: 0 1.6rem 4rem -1.4rem rgb(0 0 0 / 0.85);
+        backdrop-filter: blur(1rem);
+        text-align: center;
+      }
+
+      .gate-eyebrow {
+        margin: 0 0 0.4rem;
+        font-family: var(--font-deco);
+        font-size: 0.72rem;
+        letter-spacing: 0.42em;
+        text-transform: uppercase;
+        color: rgb(150 164 220 / 0.72);
+      }
+
+      h1 {
+        margin: 0;
+        font-family: var(--font-deco);
+        font-size: clamp(2rem, 7vw, 2.7rem);
+        font-weight: 400;
+        letter-spacing: 0.08em;
+      }
+
+      .gate-copy {
+        margin: 1rem 0 2rem;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: rgb(168 173 190 / 0.76);
+      }
+
+      form {
+        display: grid;
+        gap: 0.8rem;
+        text-align: left;
+      }
+
+      .gate-label {
+        font-size: 0.8rem;
+        color: rgb(190 195 210 / 0.72);
+      }
+
+      .password-field {
+        position: relative;
+      }
+
+      input {
+        width: 100%;
+        height: 2.9rem;
+        padding: 0 3.1rem 0 0.9rem;
+        border: 1px solid rgb(102 108 138 / 0.45);
+        border-radius: 0.45rem;
+        color: #f2f3f8;
+        background: rgb(9 10 16 / 0.68);
+        outline: none;
+      }
+
+      input:focus {
+        border-color: rgb(132 150 255 / 0.8);
+        box-shadow: 0 0 0 3px rgb(120 140 255 / 0.14);
+      }
+
+      .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 0.35rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        display: grid;
+        place-items: center;
+        transform: translateY(-50%);
+        border: 0;
+        border-radius: 0.35rem;
+        background: transparent;
+        color: rgb(168 173 190 / 0.72);
+        cursor: pointer;
+      }
+
+      .password-toggle:hover,
+      .password-toggle.is-visible {
+        color: rgb(190 196 220 / 0.9);
+        background: rgb(120 140 255 / 0.12);
+      }
+
+      .password-toggle svg {
+        width: 1.15rem;
+        height: 1.15rem;
+      }
+
+      .password-toggle .eye-closed { display: none; }
+      .password-toggle.is-visible .eye-open { display: none; }
+      .password-toggle.is-visible .eye-closed { display: block; }
+
+      button {
+        height: 2.75rem;
+        border: 0;
+        border-radius: 0.45rem;
+        color: #0b0c12;
+        background: linear-gradient(120deg, #9aa7ff, #cdd4ff);
+        font-family: var(--font-ui);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .gate-return {
+        display: inline-block;
+        margin-top: 1.6rem;
+        font-size: 0.82rem;
+        color: rgb(170 176 196 / 0.7);
+      }
+    </style>
+  </body>
+</html>

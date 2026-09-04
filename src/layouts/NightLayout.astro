@@ -5,6 +5,7 @@ import '@fontsource/atkinson-hyperlegible';
 import '../styles/global.css';
 import Skyline from '../components/Skyline.astro';
 import { ClientRouter } from 'astro:transitions';
+import { INSIDE_AUTH_STORAGE_KEY, INSIDE_AUTH_TOKEN } from '../utils/inside-auth';
 
 interface Props {
   title: string;
@@ -24,6 +25,10 @@ const heroBgImage = '/images/night-hero.jpg';
 const heroHoverBgImage = '/images/night-hero-hover.webp';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
+const insideAuthVars = {
+  INSIDE_AUTH_STORAGE_KEY,
+  INSIDE_AUTH_TOKEN,
+};
 ---
 <!doctype html>
 <html lang="zh-CN" data-night data-theme="dark" data-rainy>
@@ -46,6 +51,46 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <ClientRouter />
+    <script is:inline define:vars={insideAuthVars}>
+      (() => {
+        const authorize = () => {
+          try {
+            if (localStorage.getItem(INSIDE_AUTH_STORAGE_KEY) === INSIDE_AUTH_TOKEN) {
+              document.documentElement.setAttribute('data-inside-auth', 'ok');
+              return;
+            }
+          } catch {
+            /* localStorage 不可用时按未授权处理 */
+          }
+
+          const next = encodeURIComponent(
+            location.pathname + location.search + location.hash,
+          );
+          location.replace(`/inside-gate/?next=${next}`);
+        };
+
+        authorize();
+        document.addEventListener('astro:after-swap', authorize);
+
+        // 交还访问权限：清除设备记忆后回到地表；下次下拉会重新经过密码门。
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!target?.closest?.('#inside-revoke-access')) return;
+          try {
+            localStorage.removeItem(INSIDE_AUTH_STORAGE_KEY);
+          } catch {
+            /* 隐私模式下忽略清除失败 */
+          }
+          document.documentElement.removeAttribute('data-inside-auth');
+          window.location.replace('/');
+        });
+      })();
+    </script>
+    <style is:inline>
+      html[data-night]:not([data-inside-auth='ok']) body {
+        visibility: hidden !important;
+      }
+    </style>
   </head>
   <body>
     <header class="night-topbar">
@@ -54,6 +99,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         <input id="site-search" type="search" placeholder="搜索…" aria-label="站内搜索" autocomplete="off" />
         <div id="search-results" role="listbox" aria-label="搜索结果"></div>
       </div>
+      <button id="inside-revoke-access" class="night-revoke-link" type="button" title="交还访问权限">
+        <span class="night-revoke-arrow" aria-hidden="true">↺</span>
+        <span class="night-revoke-text">交还访问权限</span>
+      </button>
       <a class="night-exit-link" href="/" aria-label="返回地表" title="返回地表">
         <span class="night-exit-arrow" aria-hidden="true">↑</span>
         <span class="night-exit-text">返回地表</span>
@@ -286,6 +335,34 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         color: rgb(var(--text));
         font-size: 0.95rem;
         line-height: 1;
+      }
+
+      .night-revoke-link {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid rgb(var(--line) / 0.4);
+        background: rgb(var(--content-bg) / 0.3);
+        color: rgb(var(--text));
+        font-family: var(--font-ui);
+        font-size: 0.82rem;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: background 0.15s ease-out, transform 0.15s ease-out;
+      }
+      .night-revoke-link:hover {
+        background: rgb(var(--content-bg) / 0.6);
+        transform: translateY(-1px);
+      }
+      .night-revoke-link .night-revoke-arrow {
+        color: rgb(var(--text));
+        font-size: 0.95rem;
+        line-height: 1;
+      }
+      @media (max-width: 34rem) {
+        .night-revoke-link .night-revoke-text { display: none; }
       }
 
       /* 内容主体:居中,无侧栏 */

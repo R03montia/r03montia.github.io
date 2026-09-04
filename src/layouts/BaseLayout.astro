@@ -7,6 +7,7 @@ import Sidebar from '../components/Sidebar.astro';
 import Skyline from '../components/Skyline.astro';
 import Live2DWidget from '../components/Live2DWidget.astro';
 import { ClientRouter } from 'astro:transitions';
+import { INSIDE_AUTH_STORAGE_KEY, INSIDE_AUTH_TOKEN } from '../utils/inside-auth';
 
 interface Props {
   title: string;
@@ -25,6 +26,10 @@ const {
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
+const insideAuthVars = {
+  INSIDE_AUTH_STORAGE_KEY,
+  INSIDE_AUTH_TOKEN,
+};
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -94,6 +99,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       </button>
     )}
     <Live2DWidget />
+    <script is:inline define:vars={insideAuthVars}>
+      window.__insideAuth = {
+        isAuthorized: () => {
+          try {
+            return localStorage.getItem(INSIDE_AUTH_STORAGE_KEY) === INSIDE_AUTH_TOKEN;
+          } catch {
+            return false;
+          }
+        },
+        gateUrl: (next = '/inside/') =>
+          `/inside-gate/?next=${encodeURIComponent(next)}`,
+      };
+    </script>
     <script>
       const toggleTheme = () => {
         const root = document.documentElement;
@@ -197,12 +215,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       // 里版·夜 触发:页面滚到底后累计 4 次下拉滚轮,坠入夜晚。
       // 每次下拽整页轻微下沉 + 变暗作张力提示;触发后只播 body 级的
       // "night-fall" 动画(不加 data-night — 否则表版会闪出旧里版皮肤),
-      // 动画中段跳转到 /inside/,由 NightLayout 自己的 SSR data-night 接管夜色。
+      // 动画中段按设备记忆分流:已记住的设备直达里版,新设备先到密码门。
       const enterNight = () => {
+        type InsideAuthBridge = {
+          isAuthorized: () => boolean;
+          gateUrl: (next?: string) => string;
+        };
+        const insideAuthBridge = (window as unknown as { __insideAuth?: InsideAuthBridge }).__insideAuth;
         document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
         document.body.classList.add('night-enter');
         setTimeout(() => {
-          window.location.href = '/inside/';
+          window.location.href = insideAuthBridge?.isAuthorized()
+            ? '/inside/'
+            : insideAuthBridge?.gateUrl('/inside/') ?? '/inside-gate/?next=%2Finside%2F';
         }, 350);
       };
       const NIGHT_PULLS_NEEDED = 4;
@@ -219,7 +244,9 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         if (document.documentElement.hasAttribute('data-night')) return;
         if (Date.now() < nightLockUntil) return;
         const doc = document.documentElement;
-        const atBottom = doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 4;
+        // 下拉提示会给 body 加 transform；浏览器可能因此在底部再挤出几像素滚动空间。
+        // 用 32px 容差，避免刚触发提示就被误判成“不在底部”而清空计数。
+        const atBottom = doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 32;
         if (!atBottom) { resetNightPull(); return; }
         nightPullCount += 1;
         const hintLevel = Math.ceil(nightPullCount / (NIGHT_PULLS_NEEDED / 3));
