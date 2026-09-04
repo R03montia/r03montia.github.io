@@ -59,11 +59,15 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         <span class="night-exit-text">返回地表</span>
       </a>
     </header>
-    <main id="main-content" class="night-main" class:list={[{ 'with-hero': hero }]}>
+    <main
+      id="main-content"
+      class="night-main"
+      class:list={[{ 'with-hero': hero }]}
+      style={heroBgImage ? `--hero-bg-img: url(${heroBgImage}); --hero-hover-bg-img: url(${heroHoverBgImage})` : undefined}
+    >
       {hero && (
         <section
           class="night-hero"
-          style={heroBgImage ? `--hero-bg-img: url(${heroBgImage}); --hero-hover-bg-img: url(${heroHoverBgImage})` : undefined}
         >
           <div class="night-hero-hover-bg" aria-hidden="true"></div>
           <div class="night-hero-inner">
@@ -78,6 +82,7 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           </div>
         </section>
       )}
+      {hero && <div class="night-transition" aria-hidden="true"></div>}
       <div class="night-body">
         {hero ? <slot name="below-hero" /> : <slot />}
       </div>
@@ -94,24 +99,6 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       document.addEventListener('astro:after-swap', () => {
         if (window.scrollY > 0 && !location.hash) window.scrollTo(0, 0);
       });
-
-      // hero 视差:滚动时背景图以低速率跟随,营造纵深。只在有 hero 的页面上工作。
-      const heroEl = document.querySelector<HTMLElement>('.night-hero');
-      if (heroEl) {
-        let rafId = 0;
-        const updateParallax = () => {
-          rafId = 0;
-          heroEl.style.setProperty('--hero-scroll', String(window.scrollY));
-        };
-        const onParallaxScroll = () => {
-          if (!rafId) rafId = requestAnimationFrame(updateParallax);
-        };
-        window.addEventListener('scroll', onParallaxScroll, { passive: true });
-        document.addEventListener('astro:before-swap', () => {
-          window.removeEventListener('scroll', onParallaxScroll);
-          if (rafId) cancelAnimationFrame(rafId);
-        }, { once: true });
-      }
 
       // 站内搜索:与表版 BaseLayout 同一份 pagefind 客户端
       type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
@@ -334,16 +321,11 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         justify-content: center;
         text-align: center;
         overflow: hidden;
-        /* 底色 + 渐变 + 光晕;背景图放到 ::before 上做视差 */
-        background-color: rgb(var(--body-bg));
+        background-color: transparent;
         background-image:
           radial-gradient(ellipse 80% 50% at 50% 30%, rgb(60 70 110 / 0.45), transparent 70%);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
       }
-      /* hero 背景视差:图片层,滚动时以 0.4 倍速率移动,营造纵深。
-         未设 --hero-bg-img 时 background-image: none,整层透明,只剩主背景。 */
+      /* hero 背景固定在视口,但只透过 hero 区域显示;这样下方正文仍是原来的夜色渐变 */
       .night-hero::before {
         content: '';
         position: absolute;
@@ -351,18 +333,52 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         background-image: var(--hero-bg-img, none);
         background-size: cover;
         background-position: center;
-        transform: translateY(calc(var(--hero-scroll, 0) * 0.4px));
+        background-attachment: fixed;
         z-index: 0;
         pointer-events: none;
       }
-      /* 暗化蒙版,保证文字可读;独立于 ::before,这样视差不会把蒙版一起带走 */
+      /* 轻微暗化蒙版,保证标题可读,但不再遮挡固定背景 */
       .night-hero::after {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(to bottom, rgb(var(--body-bg) / 0.55), rgb(var(--body-bg) / 0.85));
+        /* 头图暗化 + 头图 → 原里版正文的过渡层:底部淡出到夜色底色,但正文背景仍保持原样 */
+        background: linear-gradient(
+          to bottom,
+          rgb(var(--body-bg) / 0.55) 0%,
+          rgb(var(--body-bg) / 0.7) 55%,
+          rgb(var(--body-bg) / 0.75) 100%
+        );
         z-index: 1;
         pointer-events: none;
+      }
+      .night-transition {
+        position: relative;
+        height: clamp(7rem, 18vh, 11rem);
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .night-transition::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--hero-bg-img, none);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: 0;
+      }
+      .night-transition::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgb(var(--body-bg) / 0.75) 0%,
+          rgb(var(--body-bg) / 0.88) 60%,
+          rgb(var(--body-bg)) 100%
+        );
+        z-index: 1;
       }
       .night-hero-inner {
         position: relative;
@@ -375,17 +391,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         background-image: var(--hero-hover-bg-img, var(--hero-bg-img, none));
         background-size: cover;
         background-position: center;
-        transform: translateY(calc(var(--hero-scroll, 0) * 0.4px));
+        background-attachment: fixed;
         z-index: 0;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.6s ease;
-        will-change: opacity, transform;
+        will-change: opacity;
       }
       .night-hero:has(.night-hero-title:hover) .night-hero-hover-bg {
         opacity: 1;
       }
       .night-hero-title {
+        display: inline-block;
+        max-width: 100%;
         margin: 0;
         font-family: var(--font-deco);
         font-weight: 400;
@@ -472,8 +490,10 @@ const ogImageUrl = new URL(ogImage, Astro.site);
           transform: none !important;
           filter: none !important;
         }
-        .night-hero-hover-bg,
         .night-hero-sub > span {
+          transition: none !important;
+        }
+        .night-hero-hover-bg {
           transition: none !important;
         }
         .night-hero-hint { opacity: 0.7 !important; }
