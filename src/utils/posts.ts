@@ -25,8 +25,8 @@ export function sortListedPosts(posts: BlogPost[]): BlogPost[] {
 }
 
 export function getRelatedPosts(current: BlogPost, candidates: BlogPost[], limit = 3): BlogPost[] {
-  return candidates
-    .filter((post) => post.id !== current.id)
+  const others = candidates.filter((post) => post.id !== current.id);
+  const ranked = others
     .map((post) => ({
       post,
       score: post.data.tags.filter((tag) => current.data.tags.includes(tag)).length,
@@ -39,4 +39,6 @@ export function getRelatedPosts(current: BlogPost, candidates: BlogPost[], limit
     ))
     .slice(0, limit)
     .map((item) => item.post);
+  if (ranked.length > 0) return ranked;
+  return sortPosts(others).slice(0, limit);
 }

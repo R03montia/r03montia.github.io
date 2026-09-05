@@ -297,7 +297,8 @@ const insideAuthVars = {
             try {
               const pf = await loadPagefind();
               const res = await pf.search(q);
-              const items = await Promise.all(res.results.slice(0, 8).map((r) => r.data()));
+              const all = await Promise.all(res.results.slice(0, 12).map((r) => r.data()));
+              const items = all.filter((d) => !d.url.startsWith('/inside/')).slice(0, 8);
               if (items.length === 0) {
                 panel.innerHTML = '<div class="sr-empty">没有匹配的结果</div>';
               } else {

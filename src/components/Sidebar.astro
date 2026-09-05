@@ -38,7 +38,7 @@ const isActive = (href: string) =>
     <div id="search-results" role="listbox" aria-label="搜索结果"></div>
   </div>
   <div class="side-foot">
-    <a class="social" href="https://github.com/R03montia" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <span class="socials"><a class="social" href="https://github.com/R03montia" target="_blank" rel="noopener noreferrer">GitHub</a><a class="social" href="/rss.xml">RSS</a></span>
     <div class="side-toggles">
       <button id="theme-toggle" type="button" aria-label="切换明暗模式" title="切换明暗模式">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -106,6 +106,7 @@ const isActive = (href: string) =>
   .side-link svg { width: 17px; height: 17px; }
   .side-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
   .side-toggles { display: flex; gap: 0.4rem; }
+  .socials { display: flex; gap: 0.8rem; }
   .social { color: rgb(var(--text-secondary)); }
   #theme-toggle,
   #rain-toggle {

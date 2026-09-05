@@ -5,20 +5,31 @@ import PostCard from '../../components/PostCard.astro';
 import { sortListedPosts } from '../../utils/posts';
 
 const posts = sortListedPosts(await getCollection('blog', (p) => !p.data.night && !p.data.draft));
-const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+const tagCounts = new Map<string, number>();
+for (const post of posts) for (const tag of post.data.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+const years = [...new Set(posts.map((p) => p.data.date.getFullYear()))].sort((a, b) => b - a);
+const byYear = (y: number) => posts.filter((p) => p.data.date.getFullYear() === y);
 ---
 <BaseLayout title="博客 | R03montia" description="全部文章。">
-  <h1 class="page-title">博客</h1>
+  <h1 class="page-title">博客 <span class="count">共 {posts.length} 篇</span></h1>
   <div class="tag-row">
-    {allTags.map((t) => <a class="tag-pill" href={`/tag/${t}/`}>#{t}</a>)}
+    {allTags.map(([t, n]) => <a class="tag-pill" href={`/tag/${t}/`}>#{t} <span class="n">{n}</span></a>)}
   </div>
-  <div class="post-list">
-    {posts.map((p) => <PostCard post={p} />)}
-  </div>
+  {years.map((y) => (
+    <section aria-label={`${y} 年文章`}>
+      <h2 class="year">{y}</h2>
+      <div class="post-list">
+        {byYear(y).map((post) => <PostCard post={post} />)}
+      </div>
+    </section>
+  ))}
 </BaseLayout>
 
 <style>
   .page-title { font-family: var(--font-ui); }
+  .count { font-size: 0.85rem; color: rgb(var(--text-secondary)); font-weight: 400; margin-left: 0.5rem; }
+  .tag-pill .n { opacity: 0.65; font-size: 0.75em; }
   .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.5rem; }
   .tag-pill {
     font-size: 0.8rem;
@@ -27,5 +38,6 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
     border: 1px solid rgb(var(--line) / 0.5);
     color: rgb(var(--text-secondary));
   }
+  .year { font-family: var(--font-ui); font-size: 1rem; color: rgb(var(--text-secondary)); margin: 1.8rem 0 0.8rem; }
   .post-list { display: grid; gap: 0.9rem; }
 </style>

@@ -5,11 +5,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div class="lost card">
     <h1>404</h1>
     <p>这一页被雨冲走了。</p>
-    <a href="/">回首页</a>
+    <div class="links">
+      <a class="btn" href="/">回首页</a>
+    </div>
   </div>
 </BaseLayout>
 
 <style>
   .lost { border-radius: 12px; padding: 4rem 2rem; text-align: center; }
   h1 { font-family: var(--font-deco); font-weight: 400; font-size: 4rem; margin: 0; }
+  .links { display: flex; justify-content: center; margin-top: 1.5rem; font-family: var(--font-ui); }
+  .btn { display: inline-block; padding: 0.45rem 1.1rem; border-radius: 8px; background: rgb(var(--accent)); color: #fff; font-size: 0.88rem; }
+  .btn:hover { text-decoration: none; filter: brightness(1.08); }
 </style>
