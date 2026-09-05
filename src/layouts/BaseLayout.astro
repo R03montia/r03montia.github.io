@@ -233,14 +233,16 @@ const insideAuthVars = {
             : insideAuthBridge?.gateUrl('/inside/') ?? '/inside-gate/?next=%2Finside%2F';
         }, 350);
       };
-      // 电脑端防误触：滚轮短时间内的连续 tick 先累积量，攒够约两格（160px）才算一次下拽，
-      // 且两次计数之间至少隔 800ms——用力一滚只算一次，想进里版得一下一下、有节奏地拽 5 次；
-      // 触底后需停稳 900ms 才开始计数（过滤触底惯性）。
-      const WHEEL_PULLS_NEEDED = 5;
-      const WHEEL_SETTLE_MS = 900;
-      const WHEEL_PULL_GAP_MS = 800;
+      // 电脑端防误触：滚轮短时间内的连续 tick 先累积量，攒够一格稍多（110px）才算一次下拽，
+      // 且两次计数之间至少隔 500ms——用力一滚 mostly 只算一次，想进里版得到底停稳后、
+      // 一下一下有节奏地拽 4 次；触底后需停稳 500ms 才开始计数（过滤触底惯性）。
+      // 底部判定带迟滞：滚轮微回跳 / 触控板抖动导致的那几像素上滑不算“离开底部”，
+      // 计数和下沉提示都保留（之前是离底 1px 就 whole 清零，视觉上就是刚沉下去又弹回来）。
+      const WHEEL_PULLS_NEEDED = 4;
+      const WHEEL_SETTLE_MS = 500;
+      const WHEEL_PULL_GAP_MS = 500;
       const WHEEL_BURST_RESET_MS = 400;
-      const WHEEL_PULL_MIN_PX = 160;
+      const WHEEL_PULL_MIN_PX = 110;
       // 手机端：手指是精细控制、没有滚轮惯性，门槛放低——触底停稳 250ms 即可，
       // 允许“滑到底不停手、继续上拽”的连贯手势（中途到达底部也算），攒够 48px 算一次，连拽 3 次进入。
       const TOUCH_PULLS_NEEDED = 3;
@@ -278,20 +280,28 @@ const insideAuthVars = {
         // 用 32px 容差，避免刚触发提示就被误判成“不在底部”而清空计数。
         return doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 32;
       };
+      // 离底超过这个距离才算真离开（清零计数、提示与停稳计时）；32~160px 的抖动带内保持一切不动。
+      const BOTTOM_LEAVE_PX = 160;
+      const isFarFromBottom = () => {
+        const doc = document.documentElement;
+        return doc.scrollTop + doc.clientHeight < doc.scrollHeight - BOTTOM_LEAVE_PX;
+      };
       const syncBottomSettled = () => {
         if (isAtBottom()) {
           if (!bottomSettledAt) bottomSettledAt = Date.now();
-        } else {
+        } else if (isFarFromBottom()) {
           bottomSettledAt = 0;
           resetNightPull();
         }
+        // 抖动带内：什么都不做，保留计数、提示与停稳计时。
       };
       // 返回是否真正计上数：防误触拦截（未停稳 / 间隔太短）时返回 false，调用方不消耗这次手势。
       const registerNightPull = (source: 'wheel' | 'touch'): boolean => {
         const now = Date.now();
         if (document.documentElement.hasAttribute('data-night')) return false;
         if (now < nightLockUntil) return false;
-        if (!isAtBottom()) { resetNightPull(); return false; }
+        // 不在底部只拦这一次，不 whole 清零（抖动时进度保留）；真离开底部的清零交给 scroll 监听。
+        if (!isAtBottom()) return false;
         const settle = source === 'touch' ? TOUCH_SETTLE_MS : WHEEL_SETTLE_MS;
         const gap = source === 'touch' ? TOUCH_PULL_GAP_MS : WHEEL_PULL_GAP_MS;
         if (!bottomSettledAt || now - bottomSettledAt < settle) return false;
@@ -323,7 +333,7 @@ const insideAuthVars = {
       };
       const onNightWheel = (e: WheelEvent) => {
         if (e.deltaY <= 0) return;
-        // 一格轻滚（约 100px）不够一次，需攒够两格左右；一次猛滚的连发 tick 合并消耗掉，只算一次。
+        // 攒够一格稍多算一次；一次猛滚的连发 tick 大部分被间隔合并消耗掉，只算一次。
         wheelAccum += e.deltaY;
         if (wheelBurstTimer) clearTimeout(wheelBurstTimer);
         wheelBurstTimer = setTimeout(() => { wheelAccum = 0; }, WHEEL_BURST_RESET_MS);
@@ -357,7 +367,8 @@ const insideAuthVars = {
         const dy = touchPullLastY - cur.clientY; // 手指上移为正
         touchPullLastY = cur.clientY;
         if (dy <= 0) return;
-        if (!isAtBottom()) { touchPullAccum = 0; return; }
+        if (isFarFromBottom()) { touchPullAccum = 0; return; }
+        if (!isAtBottom()) return;
         touchPullAccum += dy;
         if (touchPullAccum >= TOUCH_PULL_ACCUM_PX) {
           if (registerNightPull('touch')) {
