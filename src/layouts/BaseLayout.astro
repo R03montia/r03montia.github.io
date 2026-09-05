@@ -235,9 +235,15 @@ const insideAuthVars = {
       };
       const NIGHT_PULLS_NEEDED = 4;
       const NIGHT_PULL_WINDOW_MS = 2500;
+      // 防误触：滑到底后需停稳 600ms 以上才开始计数（过滤触底惯性），
+      // 相邻两次计数需间隔 250ms 以上（把一次猛拽的连续 tick 合并为一次）。
+      const NIGHT_SETTLE_MS = 600;
+      const NIGHT_PULL_GAP_MS = 250;
       let nightPullCount = 0;
       let nightPullTimer: ReturnType<typeof setTimeout> | null = null;
       let nightLockUntil = 0;
+      let lastPullAt = 0;
+      let bottomSettledAt = 0;
       const resetNightPull = () => {
         nightPullCount = 0;
         document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
@@ -248,10 +254,22 @@ const insideAuthVars = {
         // 用 32px 容差，避免刚触发提示就被误判成“不在底部”而清空计数。
         return doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 32;
       };
+      const syncBottomSettled = () => {
+        if (isAtBottom()) {
+          if (!bottomSettledAt) bottomSettledAt = Date.now();
+        } else {
+          bottomSettledAt = 0;
+          resetNightPull();
+        }
+      };
       const registerNightPull = () => {
+        const now = Date.now();
         if (document.documentElement.hasAttribute('data-night')) return;
-        if (Date.now() < nightLockUntil) return;
+        if (now < nightLockUntil) return;
         if (!isAtBottom()) { resetNightPull(); return; }
+        if (!bottomSettledAt || now - bottomSettledAt < NIGHT_SETTLE_MS) return;
+        if (now - lastPullAt < NIGHT_PULL_GAP_MS) return;
+        lastPullAt = now;
         nightPullCount += 1;
         const hintLevel = Math.ceil(nightPullCount / (NIGHT_PULLS_NEEDED / 3));
         document.body.classList.add('night-hint');
@@ -271,25 +289,50 @@ const insideAuthVars = {
         registerNightPull();
       };
       // 移动端触屏版：wheel 事件在触屏上不会触发，所以用触摸手势补齐。
-      // 手指在页面已到底部时起手、上滑（内容继续往下拽）一段距离后松手，计一次下拉。
+      // 在底部起手、上滑（内容继续往下拽）时累计距离，达标立刻计一次并给下沉提示，
+      // 不用等松手；一次触摸最多计一次，松手时若滑动达标但还没计过则补计。
       // 起手时不在底部不计（比如正好滑到底的那一下），和滚轮版逻辑对齐。
-      const TOUCH_PULL_MIN_PX = 48;
+      const TOUCH_PULL_MIN_PX = 40;
+      const TOUCH_PULL_ACCUM_PX = 64;
       let touchPullStartY: number | null = null;
+      let touchPullLastY: number | null = null;
       let touchPullFromBottom = false;
+      let touchPullAccum = 0;
+      let touchPullCounted = false;
       const onNightTouchStart = (e: TouchEvent) => {
         const first = e.touches[0];
         touchPullStartY = first ? first.clientY : null;
+        touchPullLastY = touchPullStartY;
         touchPullFromBottom = isAtBottom();
+        touchPullAccum = 0;
+        touchPullCounted = false;
+      };
+      const onNightTouchMove = (e: TouchEvent) => {
+        if (touchPullStartY == null || touchPullLastY == null) return;
+        if (!touchPullFromBottom || touchPullCounted) return;
+        const cur = e.touches[0];
+        if (!cur) return;
+        const dy = touchPullLastY - cur.clientY; // 手指上移为正
+        touchPullLastY = cur.clientY;
+        if (dy <= 0 || !isAtBottom()) return;
+        touchPullAccum += dy;
+        if (touchPullAccum >= TOUCH_PULL_ACCUM_PX) {
+          touchPullCounted = true;
+          registerNightPull();
+        }
       };
       const onNightTouchEnd = (e: TouchEvent) => {
         if (touchPullStartY == null) return;
         const last = e.changedTouches[0];
         const endY = last ? last.clientY : touchPullStartY;
         const swipeUp = touchPullStartY - endY;
+        const fromBottom = touchPullFromBottom;
         touchPullStartY = null;
-        if (!touchPullFromBottom) return;
+        touchPullLastY = null;
         touchPullFromBottom = false;
+        if (touchPullCounted || !fromBottom) return;
         if (swipeUp < TOUCH_PULL_MIN_PX) return;
+        touchPullCounted = true;
         registerNightPull();
       };
       // 返回顶部按钮：滚动超一屏淡入。
@@ -382,8 +425,11 @@ const insideAuthVars = {
           if (e.key === 'Escape') setMenu(false);
         });
         window.addEventListener('scroll', syncBackToTop, { passive: true });
+        if (!bottomSettledAt && isAtBottom()) bottomSettledAt = Date.now();
+        window.addEventListener('scroll', syncBottomSettled, { passive: true });
         window.addEventListener('wheel', onNightWheel, { passive: true });
         window.addEventListener('touchstart', onNightTouchStart, { passive: true });
+        window.addEventListener('touchmove', onNightTouchMove, { passive: true });
         window.addEventListener('touchend', onNightTouchEnd, { passive: true });
         document.addEventListener('astro:before-swap', persistThemeRain);
         document.addEventListener('astro:after-swap', () => {
