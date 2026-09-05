@@ -242,15 +242,16 @@ const insideAuthVars = {
         nightPullCount = 0;
         document.body.classList.remove('night-hint-1', 'night-hint-2', 'night-hint-3');
       };
-      const onNightWheel = (e: WheelEvent) => {
-        if (e.deltaY <= 0) return;
-        if (document.documentElement.hasAttribute('data-night')) return;
-        if (Date.now() < nightLockUntil) return;
+      const isAtBottom = () => {
         const doc = document.documentElement;
         // 下拉提示会给 body 加 transform；浏览器可能因此在底部再挤出几像素滚动空间。
         // 用 32px 容差，避免刚触发提示就被误判成“不在底部”而清空计数。
-        const atBottom = doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 32;
-        if (!atBottom) { resetNightPull(); return; }
+        return doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 32;
+      };
+      const registerNightPull = () => {
+        if (document.documentElement.hasAttribute('data-night')) return;
+        if (Date.now() < nightLockUntil) return;
+        if (!isAtBottom()) { resetNightPull(); return; }
         nightPullCount += 1;
         const hintLevel = Math.ceil(nightPullCount / (NIGHT_PULLS_NEEDED / 3));
         document.body.classList.add('night-hint');
@@ -264,6 +265,32 @@ const insideAuthVars = {
           return;
         }
         nightPullTimer = setTimeout(resetNightPull, NIGHT_PULL_WINDOW_MS);
+      };
+      const onNightWheel = (e: WheelEvent) => {
+        if (e.deltaY <= 0) return;
+        registerNightPull();
+      };
+      // 移动端触屏版：wheel 事件在触屏上不会触发，所以用触摸手势补齐。
+      // 手指在页面已到底部时起手、上滑（内容继续往下拽）一段距离后松手，计一次下拉。
+      // 起手时不在底部不计（比如正好滑到底的那一下），和滚轮版逻辑对齐。
+      const TOUCH_PULL_MIN_PX = 48;
+      let touchPullStartY: number | null = null;
+      let touchPullFromBottom = false;
+      const onNightTouchStart = (e: TouchEvent) => {
+        const first = e.touches[0];
+        touchPullStartY = first ? first.clientY : null;
+        touchPullFromBottom = isAtBottom();
+      };
+      const onNightTouchEnd = (e: TouchEvent) => {
+        if (touchPullStartY == null) return;
+        const last = e.changedTouches[0];
+        const endY = last ? last.clientY : touchPullStartY;
+        const swipeUp = touchPullStartY - endY;
+        touchPullStartY = null;
+        if (!touchPullFromBottom) return;
+        touchPullFromBottom = false;
+        if (swipeUp < TOUCH_PULL_MIN_PX) return;
+        registerNightPull();
       };
       // 返回顶部按钮：滚动超一屏淡入。
       const syncBackToTop = () => {
@@ -356,6 +383,8 @@ const insideAuthVars = {
         });
         window.addEventListener('scroll', syncBackToTop, { passive: true });
         window.addEventListener('wheel', onNightWheel, { passive: true });
+        window.addEventListener('touchstart', onNightTouchStart, { passive: true });
+        window.addEventListener('touchend', onNightTouchEnd, { passive: true });
         document.addEventListener('astro:before-swap', persistThemeRain);
         document.addEventListener('astro:after-swap', () => {
           setMenu(false);
