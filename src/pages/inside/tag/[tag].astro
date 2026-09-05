@@ -14,7 +14,7 @@ const { tag } = Astro.params;
 const posts = sortPosts(await getCollection('blog', (p) => p.data.night && !p.data.draft && p.data.tags.includes(tag!)));
 ---
 <NightLayout title={`#${tag} | 下反熔毁集群`} description={`里版标签 #${tag} 下的全部文章。`}>
-  <h1 class="page-title">#{tag}</h1>
+  <h1 class="page-title">#{tag} <span class="count">共 {posts.length} 篇</span></h1>
   <p><a href="/inside/blog/">← 返回夜里全部文章</a></p>
   <div class="post-list">
     {posts.map((p) => <PostCard post={p} night />)}
@@ -23,5 +23,6 @@ const posts = sortPosts(await getCollection('blog', (p) => p.data.night && !p.da
 
 <style>
   .page-title { font-family: var(--font-ui); }
+  .count { font-size: 0.85rem; color: rgb(var(--text-secondary)); font-weight: 400; margin-left: 0.5rem; }
   .post-list { display: grid; gap: 0.9rem; }
 </style>
