@@ -1,6 +1,6 @@
 ---
 title: 白现实（一）
-description: 昙虹港对旧 Notems 记录的整理与注解，白现实系列第一篇。
+description: 白现实一。
 date: 2025-09-12T16:20:00+08:00
 tags: [原创, 合著]
 night: true

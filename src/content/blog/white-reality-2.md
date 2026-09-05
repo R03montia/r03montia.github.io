@@ -1,6 +1,6 @@
 ---
 title: 白现实（二）
-description: 新 Notems 记录的整理与注解，白现实系列第二篇。
+description: 白现实二。
 date: 2025-09-12T16:39:00+08:00
 tags: [原创, 合著]
 night: true
