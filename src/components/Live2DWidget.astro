@@ -12,24 +12,37 @@
     widget = null;
   };
 
-  const initWidget = () => {
+  // 模型自托管在 /models/Hiyori/（约 5MB），本地加载失败时才回退到 CDN，避免外部挂掉带走看板娘。
+  const MODEL_PATHS = [
+    '/models/Hiyori/Hiyori.model3.json',
+    'https://model.hacxy.cn/Hiyori/Hiyori.model3.json',
+  ];
+  const initWidget = async () => {
     const canvas = document.querySelector<HTMLCanvasElement>('.l2d-widget canvas');
     if (!canvas || widget) return;
 
     widget = init(canvas);
-    widget.load({
-      path: 'https://model.hacxy.cn/Hiyori/Hiyori.model3.json',
-      scale: 2.1,
-      position: [0.3, -1.1],
-      volume: 0,
-      logLevel: 'warn',
-    });
+    for (const path of MODEL_PATHS) {
+      try {
+        await widget.load({
+          path,
+          scale: 2.1,
+          position: [0.3, -1.1],
+          volume: 0,
+          logLevel: 'warn',
+        });
+        return;
+      } catch {
+        // 换下一个源继续试。
+      }
+    }
+    destroyWidget();
   };
 
-  initWidget();
+  void initWidget();
 
   document.addEventListener('astro:before-swap', destroyWidget);
-  document.addEventListener('astro:after-swap', initWidget);
+  document.addEventListener('astro:after-swap', () => void initWidget());
 </script>
 
 <div class="l2d-widget" aria-hidden="true">

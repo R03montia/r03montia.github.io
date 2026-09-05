@@ -30,6 +30,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/>
           </svg>
         </button>
+        <button id="idle-fullscreen" class="idle-action" type="button" aria-label="切换全屏" title="切换全屏">全屏</button>
+        <button id="idle-wake" class="idle-action" type="button" aria-label="保持屏幕常亮" title="保持屏幕常亮">保持常亮</button>
         <a class="idle-action" href="/">退出挂机</a>
       </div>
     </div>
@@ -206,6 +208,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: rgb(var(--text-secondary));
   }
 
+  .weather[data-failed='1'] {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+
   .weather :global(button) {
     min-height: 1.8rem;
     padding: 0.2rem 0.6rem;
@@ -278,6 +286,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     text-align: center;
   }
 
+  .idle-quote[data-ready='1'] {
+    cursor: pointer;
+  }
+
   .idle-quote cite {
     color: rgb(var(--text-secondary) / 0.55);
     font-style: normal;
@@ -318,6 +330,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   const idleState = {
     clockTimer: 0 as ReturnType<typeof setInterval> | 0,
+    quoteTimer: 0 as ReturnType<typeof setInterval> | 0,
     weatherTimer: 0 as ReturnType<typeof setInterval> | 0,
     weatherGeo: null as Geo | null,
     wakeLock: null as WakeLockLike | null,
@@ -391,9 +404,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }).format(now);
   };
 
-  const setWeatherText = (text: string) => {
+  const setWeatherText = (text: string, failed = false) => {
     const box = getWeatherBox();
-    if (box) box.textContent = text;
+    if (!box) return;
+    box.textContent = text;
+    if (failed) box.dataset.failed = '1';
+    else delete box.dataset.failed;
   };
 
   const loadWeather = async (geo: Geo) => {
@@ -417,7 +433,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         : '';
       setWeatherText(`${description} · ${temperature}°${apparent}`);
     } catch {
-      setWeatherText('天气暂时不可用');
+      setWeatherText('天气暂时不可用，点击重试', true);
     }
   };
 
@@ -430,7 +446,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   const requestLocation = () => {
     if (!('geolocation' in navigator)) {
-      setWeatherText('当前浏览器不支持定位');
+      setWeatherText('当前浏览器不支持定位', true);
       return;
     }
 
@@ -449,7 +465,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         scheduleWeather(geo);
       },
       (error) => {
-        setWeatherText(error.code === error.PERMISSION_DENIED ? '定位被拒绝，可稍后重试' : '暂时无法定位');
+        setWeatherText(
+          error.code === error.PERMISSION_DENIED ? '定位被拒绝，点击重试' : '暂时无法定位，点击重试',
+          true,
+        );
       },
       { timeout: 10000, maximumAge: 10 * 60 * 1000, enableHighAccuracy: false },
     );
@@ -529,6 +548,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       clearInterval(idleState.clockTimer);
       idleState.clockTimer = 0;
     }
+    if (idleState.quoteTimer) {
+      clearInterval(idleState.quoteTimer);
+      idleState.quoteTimer = 0;
+    }
     if (idleState.weatherTimer) {
       clearInterval(idleState.weatherTimer);
       idleState.weatherTimer = 0;
@@ -549,12 +572,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const text = data.hitokoto?.trim();
       const source = data.from?.trim();
       if (!text) throw new Error('缺少一言内容');
-      node.replaceChildren(
-        document.createTextNode(text),
-        source ? Object.assign(document.createElement('cite'), { textContent: ` —— ${source}` }) : null,
-      );
+      const kids: Node[] = [document.createTextNode(text)];
+      if (source) {
+        const cite = document.createElement('cite');
+        cite.textContent = ` —— ${source}`;
+        kids.push(cite);
+      }
+      node.replaceChildren(...kids);
+      node.dataset.ready = '1';
     } catch {
-      node.textContent = '一言暂时不可用。';
+      node.textContent = '一言暂时不可用，点击重试。';
+      node.dataset.ready = '1';
     }
   };
 
@@ -571,6 +599,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     if (idleState.clockTimer) clearInterval(idleState.clockTimer);
     idleState.clockTimer = setInterval(updateClock, 1000);
+    if (idleState.quoteTimer) clearInterval(idleState.quoteTimer);
+    // 一言每 10 分钟自动换一条，点击也可以换。
+    idleState.quoteTimer = setInterval(() => void loadQuote(), 10 * 60 * 1000);
+    document.getElementById('idle-quote')?.addEventListener('click', () => void loadQuote());
+    // 天气失败时点击文字重试定位。
+    getWeatherBox()?.addEventListener('click', (e) => {
+      if ((e.currentTarget as HTMLElement | null)?.dataset.failed) renderWeatherEntry();
+    });
 
     getFullscreenButton()?.addEventListener('click', () => void toggleFullscreen());
     getWakeButton()?.addEventListener('click', () => void toggleWakeLock());
