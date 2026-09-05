@@ -46,6 +46,18 @@ const watchers = watcherBlueprints.map((watcher) => ({
           </div>
         </div>
         <div class="denied-hatch" aria-hidden="true"></div>
+        <div class="denied-hud" aria-hidden="true">
+          <div class="hud-left"><span class="hud-rec"></span><span>REC</span><span class="hud-time" data-hud-time>00:00:00</span></div>
+          <div class="hud-right">CAM 07 &middot; SECTOR 03</div>
+          <div class="hud-coords" data-hud-coords>X:0000 Y:0000</div>
+        </div>
+        <div class="denied-vignette" aria-hidden="true"></div>
+        <div class="denied-whispers" aria-hidden="true">
+          <span style="--wx:12vw; --wy:22vh; --wd:0s;">&#x770B;&#x7740;&#x4F60;</span>
+          <span style="--wx:78vw; --wy:64vh; --wd:7s;">&#x522B;&#x52A8;</span>
+          <span style="--wx:64vw; --wy:16vh; --wd:13s;">&#x5B83;&#x5728;&#x6570;&#x4F60;&#x7684;&#x547C;&#x5438;</span>
+          <span style="--wx:20vw; --wy:78vh; --wd:19s;">&#x540E;&#x9762;</span>
+        </div>
       <div class="denied-watchers" aria-hidden="true">
         {watchers.map((watcher) => (
           <div
@@ -89,6 +101,9 @@ const watchers = watcherBlueprints.map((watcher) => ({
         <p class="denied-copy">无意中来到这里的访客啊，请你快快回去</p>
         <p class="denied-copy">反熔毁集群在恒久的监视着这个页面</p>
         <p class="denied-verse glitch-hover" data-text="其一为四，苦难盘桓">其一为四，苦难盘桓</p>
+        <p class="denied-stare" data-stare>&#x5DF2;&#x88AB;&#x6CE8;&#x89C6; 0 &#x79D2;</p>
+        <p class="denied-subject glitch-hover" data-text="SUBJECT // TRACE" data-subject>SUBJECT // <span data-ip>TRACING</span></p>
+        <p class="denied-detected" data-detected hidden>SIGNAL LOCKED &mdash; DETECTED</p>
         <div class="denied-actions">
           <a class="surface-link" href="/">↑ 返回地表</a>
           <a class="retry-link glitch-hover" data-text="重试入口" href="/inside-gate/">重试入口</a>
@@ -219,7 +234,7 @@ const watchers = watcherBlueprints.map((watcher) => ({
         left: var(--x);
         top: var(--y);
         width: min(var(--size), 18vw);
-        transform: translate(-50%, -50%) rotate(var(--rotate));
+        transform: translate(-50%, -50%) rotate(var(--rotate)) scale(var(--approach, 1));
         opacity: 0.9;
         filter: drop-shadow(0 0 6px rgb(255 40 40 / 0.25));
       }
@@ -390,17 +405,20 @@ const watchers = watcherBlueprints.map((watcher) => ({
         z-index: -2;
       }
 
-      .glitch-hover:hover::before {
+      .glitch-hover:hover::before,
+      .glitch-hover.burst::before {
         opacity: 1;
         animation: ge-anim-top 0.3s linear infinite;
       }
 
-      .glitch-hover:hover::after {
+      .glitch-hover:hover::after,
+      .glitch-hover.burst::after {
         opacity: 1;
         animation: ge-anim-bottom 0.3s linear infinite;
       }
 
-      .glitch-hover:hover {
+      .glitch-hover:hover,
+      .glitch-hover.burst {
         animation: ge-anim-base 0.3s linear infinite;
       }
 
@@ -434,6 +452,10 @@ const watchers = watcherBlueprints.map((watcher) => ({
         .glitch-hover::before,
         .glitch-hover::after,
         .eye-lid,
+        .denied-vignette,
+        .denied-whispers span,
+        .hud-rec,
+        .denied-detected,
         .camera-rec {
           animation: none !important;
           transition: none !important;
@@ -468,6 +490,112 @@ const watchers = watcherBlueprints.map((watcher) => ({
         100% {
           opacity: 0.15;
         }
+      }
+
+      /* ===== 监控 HUD：让你意识到自己正在被录像 ===== */
+      .denied-hud {
+        position: fixed;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        color: rgb(255 80 80 / 0.6);
+      }
+      .hud-left {
+        position: absolute;
+        top: 1rem;
+        left: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .hud-rec {
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: #ff3b3b;
+        box-shadow: 0 0 8px rgb(255 40 40 / 0.8);
+        animation: watcher-rec 1.6s steps(1, end) infinite;
+      }
+      .hud-right {
+        position: absolute;
+        top: 1rem;
+        right: 1.2rem;
+      }
+      .hud-coords {
+        position: absolute;
+        bottom: 1rem;
+        right: 1.2rem;
+        color: rgb(255 80 80 / 0.45);
+      }
+
+      /* ===== 呼吸暗角：整个页面在缓慢呼吸 ===== */
+      .denied-vignette {
+        position: fixed;
+        inset: 0;
+        z-index: 4;
+        pointer-events: none;
+        background: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 42%, rgb(0 0 0 / 0.8) 100%);
+        animation: denied-breathe 4s ease-in-out infinite;
+      }
+      @keyframes denied-breathe {
+        0%, 100% { opacity: 0.45; }
+        50% { opacity: 1; }
+      }
+
+      /* ===== 悄悄话：余光里的字 ===== */
+      .denied-whispers {
+        position: fixed;
+        inset: 0;
+        z-index: 4;
+        pointer-events: none;
+      }
+      .denied-whispers span {
+        position: absolute;
+        left: var(--wx);
+        top: var(--wy);
+        font-family: var(--font-deco);
+        font-size: 0.95rem;
+        letter-spacing: 0.5em;
+        color: rgb(255 70 70 / 0.5);
+        opacity: 0;
+        animation: whisper-flicker 26s linear infinite;
+        animation-delay: var(--wd);
+      }
+      @keyframes whisper-flicker {
+        0%, 91%, 96%, 100% { opacity: 0; }
+        92%, 94% { opacity: 0.8; }
+      }
+
+      .denied-stare {
+        margin: 1.4rem 0 0;
+        font-size: 0.78rem;
+        letter-spacing: 0.3em;
+        color: rgb(255 90 90 / 0.65);
+      }
+      .denied-detected {
+        margin: 0.5rem 0 0;
+        font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.34em;
+        color: rgb(255 60 60 / 0.85);
+        text-shadow: 0 0 10px rgb(220 30 30 / 0.6);
+        animation: denied-blink 1.2s steps(1, end) infinite;
+      }
+      @keyframes denied-blink {
+        0%, 60% { opacity: 1; }
+        61%, 100% { opacity: 0.25; }
+      }
+      .denied-subject {
+        margin: 0.7rem 0 0;
+        font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.22em;
+        color: rgb(139 20 20 / 0.9);
+        text-shadow: 0 0 12px rgb(180 30 30 / 0.45);
+        cursor: default;
       }
 
       .denied-actions {
@@ -505,6 +633,11 @@ const watchers = watcherBlueprints.map((watcher) => ({
         }
       }
 
+      @media (max-width: 768px) {
+        .hud-coords { display: none; }
+        .denied-whispers span:nth-child(3),
+        .denied-whispers span:nth-child(4) { display: none; }
+      }
       @media (max-width: 480px) {
         .watcher {
           width: min(var(--size), 12vw);
@@ -544,6 +677,81 @@ const watchers = watcherBlueprints.map((watcher) => ({
         });
       };
 
+      const coordsEl = document.querySelector('[data-hud-coords]');
+      const timeEl = document.querySelector('[data-hud-time]');
+      const stareEl = document.querySelector('[data-stare]');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const startedAt = Date.now();
+      const pad = (v: number) => String(v).padStart(2, '0');
+      const stareStages = [
+        { at: 45, text: '\u4E0D\u8981\u56DE\u5934\u3002' },
+        { at: 25, text: '\u5B83\u4EEC\u5DF2\u7ECF\u8BB0\u4F4F\u4E86\u4F60\u7684\u4F4D\u7F6E\u3002' },
+        { at: 12, text: '\u4F60\u8FD8\u6CA1\u6709\u79BB\u5F00\u3002' },
+      ];
+      const tick = () => {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+        if (timeEl) {
+          timeEl.textContent = `${pad(Math.floor(elapsed / 3600))}:${pad(Math.floor(elapsed / 60) % 60)}:${pad(elapsed % 60)}`;
+        }
+        if (stareEl) {
+          const hit = stareStages.find((s) => elapsed >= s.at);
+          stareEl.textContent = hit ? hit.text : `\u5DF2\u88AB\u6CE8\u89C6 ${elapsed} \u79D2`;
+        }
+        if (!reduceMotion) {
+          const approach = (1 + Math.min(elapsed / 60, 1) * 0.35).toFixed(3);
+          watchers.forEach((w) => w.style.setProperty('--approach', approach));
+        }
+        if (elapsed >= 25 && !traced) { traced = true; traceIp(); }
+      };
+      setInterval(tick, 1000);
+      tick();
+
+      const ipEl = document.querySelector('[data-ip]');
+      const subjectEl = document.querySelector('[data-subject]');
+      const maskIp = (ip: string): string => {
+        const parts = ip.split('.');
+        if (parts.length !== 4) return ip;
+        return `${parts[0]}.\u25AA\u25AA.\u25AA\u25AA.${parts[3]}`;
+      };
+      const detectedEl = document.querySelector('[data-detected]');
+      const typeText = (text: string, done?: () => void) => {
+        if (!ipEl) { done?.(); return; }
+        let i = 0;
+        const timer = setInterval(() => {
+          i += 1;
+          ipEl.textContent = text.slice(0, i);
+          if (subjectEl) subjectEl.setAttribute('data-text', `SUBJECT // ${text.slice(0, i)}`);
+          if (i >= text.length) { clearInterval(timer); done?.(); }
+        }, 90);
+      };
+      const traceIp = async () => {
+        try {
+          const ctrl = new AbortController();
+          const killer = setTimeout(() => ctrl.abort(), 3000);
+          const r = await fetch('https://api.ipify.org?format=json', { signal: ctrl.signal });
+          clearTimeout(killer);
+          const j = await r.json();
+          if (j && j.ip) {
+            typeText(maskIp(String(j.ip)), () => detectedEl?.removeAttribute('hidden'));
+            return;
+          }
+          throw new Error('no ip');
+        } catch {
+          typeText('\u4F60\u4E0D\u53EF\u80FD\u6C38\u8FDC\u79BB\u7EBF\u7684\uFF0C\u5BF9\u5427\uFF1F');
+        }
+      };
+      let traced = false;
+
+      const burstTarget = document.querySelector('.denied-card h1');
+      if (burstTarget && !reduceMotion) {
+        const burst = () => {
+          burstTarget.classList.add('burst');
+          setTimeout(() => burstTarget.classList.remove('burst'), 350);
+        };
+        setTimeout(burst, 5000);
+        setInterval(burst, 9000);
+      }
+
       const scheduleWatcherUpdate = () => {
         if (!frame) {
           frame = requestAnimationFrame(updateWatcherLooks);
@@ -554,6 +762,7 @@ const watchers = watcherBlueprints.map((watcher) => ({
         window.addEventListener('pointermove', (event) => {
           pointerX = event.clientX;
           pointerY = event.clientY;
+          if (coordsEl) coordsEl.textContent = `X:${String(event.clientX).padStart(4, '0')} Y:${String(event.clientY).padStart(4, '0')}`;
           scheduleWatcherUpdate();
         }, { passive: true });
 
