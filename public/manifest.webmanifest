@@ -1,0 +1,27 @@
+{
+  "name": "R03montia",
+  "short_name": "R03montia",
+  "description": "R03montia 的个人站点：博客、项目与关于。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e1e1e1",
+  "theme_color": "#cdd4dc",
+  "icons": [
+    {
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
