@@ -30,6 +30,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/>
           </svg>
         </button>
+        <button id="idle-mascot-toggle" class="idle-action" type="button" aria-label="隐藏看板娘" title="隐藏看板娘" aria-pressed="false">隐藏看板娘</button>
         <button id="idle-fullscreen" class="idle-action" type="button" aria-label="切换全屏" title="切换全屏">全屏</button>
         <button id="idle-wake" class="idle-action" type="button" aria-label="保持屏幕常亮" title="保持屏幕常亮">保持常亮</button>
         <a class="idle-action" href="/">退出挂机</a>
@@ -133,6 +134,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     width: 2rem;
     min-height: 2rem;
     padding: 0;
+  }
+
+  @media (max-width: 48rem) {
+    #idle-mascot-toggle { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #idle-mascot-toggle { display: none; }
   }
 
   #theme-toggle svg,
@@ -335,6 +344,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     weatherGeo: null as Geo | null,
     wakeLock: null as WakeLockLike | null,
     wakeWanted: false,
+    mascotHidden: false,
   };
 
   const weatherDescriptions: Record<number, string> = {
@@ -371,6 +381,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const getWeatherBox = () => document.getElementById('idle-weather');
   const getWakeButton = () => document.getElementById('idle-wake');
   const getFullscreenButton = () => document.getElementById('idle-fullscreen');
+  const getMascotButton = () => document.getElementById('idle-mascot-toggle');
   const wakeLockApi = () => (navigator as WakeLockNavigator).wakeLock;
 
   const readGeo = (): Geo | null => {
@@ -486,6 +497,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     requestLocation();
   };
 
+  const setMascotHidden = (hidden: boolean) => {
+    idleState.mascotHidden = hidden;
+    const root = document.querySelector('.l2d-widget');
+    if (root) {
+      if (hidden) root.setAttribute('data-hidden', 'true');
+      else root.removeAttribute('data-hidden');
+      root.style.setProperty('visibility', hidden ? 'hidden' : 'visible');
+    }
+    const button = getMascotButton();
+    if (!button) return;
+    const label = hidden ? '显示看板娘' : '隐藏看板娘';
+    button.textContent = label;
+    button.setAttribute('aria-label', label);
+    button.setAttribute('aria-pressed', String(hidden));
+    button.title = label;
+  };
+
+  const toggleMascot = () => {
+    setMascotHidden(!idleState.mascotHidden);
+  };
+
   const syncFullscreenButton = () => {
     const button = getFullscreenButton();
     if (!button) return;
@@ -558,6 +590,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
     idleState.weatherGeo = null;
     idleState.wakeWanted = false;
+    idleState.mascotHidden = false;
+    const mascotRoot = document.querySelector('.l2d-widget');
+    mascotRoot?.removeAttribute('data-hidden');
+    mascotRoot?.style.removeProperty('display');
+    mascotRoot?.style.removeProperty('visibility');
     void idleState.wakeLock?.release();
     idleState.wakeLock = null;
   };
@@ -596,6 +633,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     void loadQuote();
     syncFullscreenButton();
     syncWakeButton();
+    setMascotHidden(false);
 
     if (idleState.clockTimer) clearInterval(idleState.clockTimer);
     idleState.clockTimer = setInterval(updateClock, 1000);
@@ -616,6 +654,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     (window as unknown as { __idlePageReady?: boolean }).__idlePageReady = true;
     document.addEventListener('astro:page-load', initIdlePage);
     document.addEventListener('astro:before-swap', cleanupIdlePage);
+    document.addEventListener('click', (event) => {
+      const target = event.target as Element | null;
+      if (target?.closest('#idle-mascot-toggle')) toggleMascot();
+    });
     document.addEventListener('fullscreenchange', syncFullscreenButton);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && idleState.wakeWanted && !idleState.wakeLock) {
