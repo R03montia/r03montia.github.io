@@ -41,6 +41,9 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# 挂机锁本机工具的密码（不进仓库）
+tools/idle-lock/password.txt
+
 # Dependencies
 node_modules/
 
