@@ -31,6 +31,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </svg>
         </button>
         <button id="idle-mascot-toggle" class="idle-action" type="button" aria-label="隐藏看板娘" title="隐藏看板娘" aria-pressed="false">隐藏看板娘</button>
+        <button id="idle-note-toggle" class="idle-action" type="button" aria-label="显示勿动提示" title="显示勿动提示" aria-pressed="false">显示勿动提示</button>
         <button id="idle-fullscreen" class="idle-action" type="button" aria-label="切换全屏" title="切换全屏">全屏</button>
         <button id="idle-wake" class="idle-action" type="button" aria-label="保持屏幕常亮" title="保持屏幕常亮">保持常亮</button>
         <button id="idle-exit" class="idle-action" type="button" aria-label="退出挂机" title="退出挂机">退出挂机</button>
@@ -58,6 +59,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
     </article>
 
+    <p class="idle-note" id="idle-note">正在跑数据 · 勿动</p>
+
+    <script is:inline>
+      // 与模块脚本里的 IDLE_NOTE_STORAGE_KEY 保持同步。
+      // 在解析期同步执行，直接加载 / 刷新挂机页时不会出现「先无后有大字」的闪烁。
+      (() => {
+        try {
+          if (localStorage.getItem('idle-note-visible') === 'on') {
+            document.getElementById('idle-note').dataset.visible = '1';
+          }
+        } catch {}
+      })();
+    </script>
+
     <p class="idle-quote" id="idle-quote"></p>
   </section>
 </BaseLayout>
@@ -68,6 +83,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     height: 100dvh;
     display: grid;
     place-items: center;
+    /* 提示开启后网格会有第二个 auto 行；显式居中，避免默认的 stretch 把两行拉开。 */
+    align-content: center;
+    row-gap: clamp(1.5rem, 4vw, 2.5rem);
     padding: 6rem clamp(1rem, 4vw, 2.5rem) 4rem;
   }
 
@@ -327,6 +345,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: rgb(var(--text-secondary) / 0.5);
   }
 
+  /* 挂机页「勿动提示」：默认不参与布局，开启后成为网格第二行。 */
+  .idle-note {
+    display: none;
+    margin: 0;
+    color: rgb(var(--accent));
+    font-family: var(--font-ui);
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.16em;
+    text-align: center;
+    text-shadow: 0 0 1.5rem rgb(var(--accent) / 0.3);
+  }
+
+  .idle-note[data-visible='1'] {
+    display: block;
+  }
+
   @media (max-width: 40rem) {
     .idle-stage {
       padding-top: 8.5rem;
@@ -367,6 +403,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     wakeLock: null as WakeLockLike | null,
     wakeWanted: false,
     mascotHidden: false,
+    noteVisible: false,
   };
 
   const weatherDescriptions: Record<number, string> = {
@@ -404,7 +441,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const getWakeButton = () => document.getElementById('idle-wake');
   const getFullscreenButton = () => document.getElementById('idle-fullscreen');
   const getMascotButton = () => document.getElementById('idle-mascot-toggle');
+  const getNoteButton = () => document.getElementById('idle-note-toggle');
+  const getNoteBox = () => document.getElementById('idle-note');
   const wakeLockApi = () => (navigator as WakeLockNavigator).wakeLock;
+
+  const IDLE_NOTE_STORAGE_KEY = 'idle-note-visible';
 
   const readGeo = (): Geo | null => {
     try {
@@ -540,6 +581,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     setMascotHidden(!idleState.mascotHidden);
   };
 
+  const readNoteVisible = (): boolean => {
+    try {
+      return localStorage.getItem(IDLE_NOTE_STORAGE_KEY) === 'on';
+    } catch {
+      return false;
+    }
+  };
+
+  const persistNoteVisible = (visible: boolean) => {
+    try {
+      localStorage.setItem(IDLE_NOTE_STORAGE_KEY, visible ? 'on' : 'off');
+    } catch {
+      // localStorage 不可用时仅本次会话生效。
+    }
+  };
+
+  // persist=false 用于从存储恢复，避免把刚读出来的值再写回去。
+  const setNoteVisible = (visible: boolean, persist = true) => {
+    idleState.noteVisible = visible;
+    const box = getNoteBox();
+    if (box) {
+      if (visible) box.dataset.visible = '1';
+      else delete box.dataset.visible;
+    }
+    const button = getNoteButton();
+    if (button) {
+      const label = visible ? '隐藏勿动提示' : '显示勿动提示';
+      button.textContent = label;
+      button.setAttribute('aria-label', label);
+      button.setAttribute('aria-pressed', String(visible));
+      button.title = label;
+    }
+    if (persist) persistNoteVisible(visible);
+  };
+
+  const toggleNote = () => {
+    setNoteVisible(!idleState.noteVisible);
+  };
+
   const syncFullscreenButton = () => {
     const button = getFullscreenButton();
     if (!button) return;
@@ -613,6 +693,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     idleState.weatherGeo = null;
     idleState.wakeWanted = false;
     idleState.mascotHidden = false;
+    idleState.noteVisible = false;
     const mascotRoot = document.querySelector('.l2d-widget');
     mascotRoot?.removeAttribute('data-hidden');
     mascotRoot?.style.removeProperty('display');
@@ -724,6 +805,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     idleLockState.wasFullscreen = Boolean(document.fullscreenElement);
     syncWakeButton();
     setMascotHidden(false);
+    setNoteVisible(readNoteVisible(), false);
     void syncIdleLockStatus();
     document.getElementById('idle-exit')?.addEventListener('click', () => void exitIdlePage());
 
@@ -749,6 +831,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     document.addEventListener('click', (event) => {
       const target = event.target as Element | null;
       if (target?.closest('#idle-mascot-toggle')) toggleMascot();
+      if (target?.closest('#idle-note-toggle')) toggleNote();
     });
     document.addEventListener('fullscreenchange', onFullscreenChange);
     document.addEventListener('visibilitychange', () => {
