@@ -161,7 +161,7 @@ const fmt = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', d
   .prose :global(code) { background: rgb(var(--text) / 0.08); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.88em; }
   .prose :global(pre) { background: rgb(var(--text) / 0.92); color: rgb(var(--content-bg)); padding: 1rem 1.2rem; border-radius: 8px; overflow-x: auto; }
   .prose :global(pre code) { background: none; color: inherit; padding: 0; }
-  .prose :global(img) { max-width: 100%; filter: grayscale(1); transition: filter 0.3s ease; }
+  .prose :global(img) { display: block; margin-inline: auto; max-width: 100%; filter: grayscale(1); transition: filter 0.3s ease; }
   .prose :global(img:hover) { filter: grayscale(0); }
   /* 右侧空白区要能完整放下目录时才显示 */
   @media (max-width: 80rem) {
