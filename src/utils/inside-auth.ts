@@ -2,7 +2,7 @@ export const INSIDE_AUTH_STORAGE_KEY = 'inside:authorized:v1';
 
 /** 客户端只保存校验用哈希；测试密码不在前端源码里明文出现。 */
 export const INSIDE_AUTH_TOKEN =
-  '2d5f0919e9eb8a7f2b8567cf7ac360e9d6e1f4b8ef15f90d467276cf268f3596';
+  'ff87be27e97734a29a8248ab754952eae01a27005a315a063f4f090491cd76da';
 
 export const isInsideDeviceAuthorized = (): boolean => {
   try {
